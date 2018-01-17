@@ -114,7 +114,7 @@ class Circle {
       point = vec.to_a();
       angle += angleIncrement;
       points.push(point.slice(0));
-      lines.push(new Line(points));
+      lines.push(new Line(...points));
     }
 
     return lines;
@@ -123,7 +123,6 @@ class Circle {
   intersectsWith(otherCircle) {
     const thisLines = this.asLines();
     const otherLines = otherCircle.asLines();
-
     for (let i=0; i<thisLines.length; i++) {
       for (let j=0; j<otherLines.length; j++) {
         if (thisLines[i].intersectsWith(otherLines[j])) {

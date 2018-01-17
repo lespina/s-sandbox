@@ -29,7 +29,14 @@ class SandBox {
 
   update(otherCircles) {
     const newView = [];
-    this.inView.forEach(circle => {
+    this.inView.forEach((circle, i) => {
+      otherCircles.forEach((otherCircle, j) => {
+        if (i !== j && circle.intersectsWith(otherCircle)) {
+          circle.rebound();
+        }
+      });
+
+
       circle.update();
       if (circle.inBounds(this.xDim, this.yDim)) {
         newView.push(circle);
@@ -40,7 +47,7 @@ class SandBox {
   }
 
   animateCallback(ctx) {
-    this.update();
+    this.update(this.inView);
     this.render(ctx);
     requestAnimationFrame(this.animateCallback.bind(this, ctx));
   }

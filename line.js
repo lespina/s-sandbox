@@ -11,10 +11,12 @@ class Line {
 
   intersectsWith(otherLine) {
     return LineIntersection.isSegmentIntersected(
-      this.start,
-      this.end,
-      otherLine.start,
-      otherLine.end
+      [
+        this.start,
+        this.end,
+        otherLine.start,
+        otherLine.end
+      ]
     );
   }
 }
