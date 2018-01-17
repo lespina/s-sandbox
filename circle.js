@@ -54,6 +54,12 @@ class Circle {
 
   rebound() {
     this.moveStep.reverse();
+    this.cannotCollide = true;
+    window.setTimeout(this.allowCollision.bind(this), 150);
+  }
+
+  allowCollision() {
+    this.cannotCollide = false;
   }
 
   update() {

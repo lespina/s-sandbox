@@ -1,19 +1,19 @@
 const Circle = require('./circle');
 
 class SandBox {
-  constructor(xDim, yDim) {
+  constructor(xDim, yDim, numCircles) {
     this.xDim = xDim;
     this.yDim = yDim;
 
     this.inView = [];
-    for (let i=0; i<100; i++) {
+    for (let i=0; i<numCircles; i++) {
       const circle = Circle.createRandom();
       this.inView.push(circle);
     }
   }
 
-  static start(xDim, yDim) {
-    const sandbox = new SandBox(xDim, yDim);
+  static start(xDim, yDim, numCircles) {
+    const sandbox = new SandBox(xDim, yDim, numCircles);
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -31,7 +31,7 @@ class SandBox {
     const newView = [];
     this.inView.forEach((circle, i) => {
       otherCircles.forEach((otherCircle, j) => {
-        if (i !== j && circle.intersectsWith(otherCircle)) {
+        if (!circle.cannotCollide && i !== j && circle.intersectsWith(otherCircle)) {
           circle.rebound();
         }
       });
