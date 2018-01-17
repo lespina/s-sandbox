@@ -1,4 +1,5 @@
 const SandBox = require('./sandbox.js');
+const Circle = require('./circle.js');
 
 document.addEventListener('DOMContentLoaded', () => {
   SandBox.start(1000, 1000);

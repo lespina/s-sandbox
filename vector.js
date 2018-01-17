@@ -1,7 +1,19 @@
 class Vector {
-  constructor(nums) {
-    this.nums = nums;
-    this.length = nums.length;
+  constructor(arg1, arg2) {
+    if (arg2 === undefined) {
+      this.nums = arg1;
+    } else {
+      const mag = arg1;
+      const angle = arg2;
+      const x = mag * Math.cos(angle);
+      const y = mag * Math.sin(angle);
+      this.nums = [x, y];
+    }
+  }
+
+  reverse() {
+    const [x, y] = this.nums;
+    this.nums = [-x, -y];
   }
 
   static random(bounds, includeNegatives) {

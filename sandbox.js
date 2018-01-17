@@ -5,11 +5,9 @@ class SandBox {
     this.xDim = xDim;
     this.yDim = yDim;
 
-    // this.circles = [];
     this.inView = [];
     for (let i=0; i<100; i++) {
       const circle = Circle.createRandom();
-      // this.circles.push(circle);
       this.inView.push(circle);
     }
   }
@@ -29,7 +27,7 @@ class SandBox {
     });
   }
 
-  update() {
+  update(otherCircles) {
     const newView = [];
     this.inView.forEach(circle => {
       circle.update();

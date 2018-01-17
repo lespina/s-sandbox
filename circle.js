@@ -1,3 +1,4 @@
+const Line = require('./line.js');
 const Vector = require('./vector.js');
 
 const RADIUS = 30;
@@ -51,6 +52,10 @@ class Circle {
     this.mass = mass;
   }
 
+  rebound() {
+    this.moveStep.reverse();
+  }
+
   update() {
     this.pos = this.pos.add(this.moveStep);
   }
@@ -91,6 +96,43 @@ class Circle {
     });
 
     return answer;
+  }
+
+  asLines(numLines = 6) {
+    const [x, y] = this.pos.to_a();
+
+    const lines = [];
+    const angleIncrement = 2 * Math.PI / numLines;
+
+    let point = [x, y + this.radius];
+    let angle = angleIncrement;
+
+    for (let i=0; i<numLines; i++) {
+      const points = [point.slice(0)];
+      const relativeVec = new Vector(this.radius, angle);
+      const vec = this.pos.add(relativeVec);
+      point = vec.to_a();
+      angle += angleIncrement;
+      points.push(point.slice(0));
+      lines.push(new Line(points));
+    }
+
+    return lines;
+  }
+
+  intersectsWith(otherCircle) {
+    const thisLines = this.asLines();
+    const otherLines = otherCircle.asLines();
+
+    for (let i=0; i<thisLines.length; i++) {
+      for (let j=0; j<otherLines.length; j++) {
+        if (thisLines[i].intersectsWith(otherLines[j])) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
 }
