@@ -1,7 +1,6 @@
 const Vector = require('./vector.js');
 
 const RADIUS = 30;
-const COLOR = "#ff0000";
 const HEX_DIGITS = "0123456789ABCDEF";
 
 class Circle {
@@ -70,6 +69,28 @@ class Circle {
       2 * Math.PI
     );
     ctx.fill();
+  }
+
+  inBounds(xDim, yDim) {
+    const [x, y] = this.pos.to_a();
+
+    const top = [x, y + this.radius];
+    const bottom = [x, y - this.radius];
+    const right = [x + this.radius, y];
+    const left = [x - this.radius, y];
+
+    let answer = false;
+
+    [top, bottom, left, right].forEach(pos => {
+      const [x, y] = pos;
+
+      if (
+        0 <= x && x <= xDim &&
+        0 <= y && y <= yDim
+      ) { answer = true; }
+    });
+
+    return answer;
   }
 
 }

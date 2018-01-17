@@ -5,11 +5,13 @@ class SandBox {
     this.xDim = xDim;
     this.yDim = yDim;
 
-    this.circles = [];
-    for (let i=0; i<10; i++) {
-      this.circles.push(Circle.createRandom());
+    // this.circles = [];
+    this.inView = [];
+    for (let i=0; i<100; i++) {
+      const circle = Circle.createRandom();
+      // this.circles.push(circle);
+      this.inView.push(circle);
     }
-
   }
 
   static start(xDim, yDim) {
@@ -22,15 +24,21 @@ class SandBox {
 
   render(ctx) {
     ctx.clearRect(0, 0, this.xDim, this.yDim);
-    this.circles.forEach(circle => {
+    this.inView.forEach(circle => {
       circle.render(ctx);
     });
   }
 
   update() {
-    this.circles.forEach(circle => {
+    const newView = [];
+    this.inView.forEach(circle => {
       circle.update();
-    });
+      if (circle.inBounds(this.xDim, this.yDim)) {
+        newView.push(circle);
+      }
+    }, this);
+
+    this.inView = newView;
   }
 
   animateCallback(ctx) {
