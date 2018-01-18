@@ -155,6 +155,23 @@ class Circle {
     return false;
   }
 
+  chooseV1fx(otherCircle) {
+    const randNum = Math.random();
+    const newVel = Math.abs(randNum > 0.5) ? this.x() * randNum : this.x() * (1 + randNum);
+
+    const thisMomentum = this.mass * this.x();
+    const otherMomentum = otherCircle.mass * otherCircle.x();
+    const totalMomentum = thisMomentum + otherMomentum;
+
+    let posOrNeg = ((totalMomentum > 0) ? 1 : -1);
+
+    if (this.mass > otherCircle.mass) {
+      return newVel * posOrNeg;
+    } else {
+      return newVel * -posOrNeg;
+    }
+  }
+
   rebound(otherCircle) {
     //CONSTANTS:
     const v10x = this.x();
@@ -171,9 +188,7 @@ class Circle {
     const u2 = m2 / m1;
 
     //CHOOSING RANDOM VALUE FOR: x component of final velocity of this particle
-    // const v1fx = (Math.random() * m1 * this.x() + Math.random() * m2 * otherCircle.x()) / m1;
-    const randNum = Math.random();
-    const v1fx = (randNum > 0.5) ? this.x() * randNum : this.x() * (1 + randNum);
+    const v1fx = this.chooseV1fx(otherCircle);
 
     const v2fx = u1 * v10x + v20x - u1 * v1fx;
 
