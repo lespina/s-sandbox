@@ -144,6 +144,12 @@ class Circle {
   }
 
   rebound(otherCircle) {
+    if (this.angle() - otherCircle.angle() < (2 * Math.PI / 36)) {
+      const angle = Math.random() * Math.PI;
+      this.rotate(angle);
+      otherCircle.rotate(Math.PI + angle);
+    }
+
     const totalMomentumX = this.momentumX() + otherCircle.momentumX();
     const totalMomentumY = this.momentumY() + otherCircle.momentumY();
 
@@ -192,6 +198,17 @@ class Circle {
     return Math.abs(this.moveStep.y() * this.mass);
   }
 
+  reverse() {
+    this.moveStep.reverse();
+  }
+
+  angle() {
+    return this.moveStep.angle();
+  }
+
+  rotate(angle) {
+    this.moveStep.rotate(angle);
+  }
 }
 
 module.exports = Circle;

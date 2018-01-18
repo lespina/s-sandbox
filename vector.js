@@ -92,6 +92,14 @@ class Vector {
   fdiv(...vectors) {
     return this.operate((a, b) => a / b, ...vectors);
   }
+
+  rotate(angle = Math.PI / 2) {
+    const [x, y] = this.nums;
+    this.nums = [
+      x * Math.cos(angle) + y * Math.sin(angle),
+      -x * Math.sin(angle) + y * Math.cos(angle)
+    ];
+  }
 }
 
 module.exports = Vector;
