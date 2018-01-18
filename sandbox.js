@@ -2,15 +2,16 @@ const Circle = require('./circle');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, dampeningFactor = 0.95) {
+  constructor(xDim, yDim, numCircles, dampeningFactor = 1) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
 
-    this.inView = [];
+    this.inView = {};
     for (let i=0; i<numCircles; i++) {
       const circle = Circle.createRandom();
-      this.inView.push(circle);
+      circle.id = i;
+      this.inView[circle.id] = circle;
     }
 
   }
@@ -25,44 +26,66 @@ class SandBox {
 
   render(ctx) {
     ctx.clearRect(0, 0, this.xDim, this.yDim);
-    this.inView.forEach(circle => {
+    Object.values(this.inView).forEach(circle => {
       circle.render(ctx);
     });
   }
 
   update(otherCircles) {
-    const newView = [];
-    this.inView.forEach((circle, i) => {
-      let newCircle;
-      otherCircles.forEach((otherCircle, j) => {
-        if (!circle.cannotCollide && i !== j && circle.intersectsWith(otherCircle)) {
-          newCircle = Circle.copy(circle);
-          newCircle.moveStep = newCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
-          newCircle.rebound(otherCircle);
+    for (let circleId in otherCircles) {
+      const circle = otherCircles[circleId];
+
+      for (let otherCircleId in otherCircles) {
+        const otherCircle = otherCircles[otherCircleId];
+        if (!circle.cannotCollide && circleId !== otherCircleId && circle.intersectsWith(otherCircle)) {
+          delete otherCircles[otherCircle];
+          circle.rebound(otherCircle);
+          otherCircle.update();
         }
-      }, this);
-
-      let chosenCircle;
-      if (newCircle) {
-        chosenCircle = newCircle;
-      } else {
-        chosenCircle = circle;
       }
 
-      chosenCircle.update();
-      if (chosenCircle.inBounds(this.xDim, this.yDim)) {
-        newView.push(chosenCircle);
-      } else {
-        chosenCircle.reverse();
-        newView.push(chosenCircle);
-      }
-    }, this);
+      circle.update();
+    }
 
-    this.inView = newView;
+    for (let circleId in this.inView) {
+      const circle = otherCircles[circleId];
+      if (!circle.inBounds(this.xDim, this.yDim)) {
+        circle.reverse();
+      }
+    }
+
+
+    // this.inView.forEach((circle, i) => {
+    //   let newCircle;
+    //   otherCircles.forEach((otherCircle, j) => {
+    //     if (!circle.cannotCollide && i !== j && circle.intersectsWith(otherCircle)) {
+    //       newCircle = Circle.copy(circle);
+    //       // newCircle.moveStep = newCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
+    //       newCircle.rebound(otherCircle);
+    //     }
+    //   }, this);
+    //
+    //   let chosenCircle;
+    //   if (newCircle) {
+    //     chosenCircle = newCircle;
+    //   } else {
+    //     chosenCircle = circle;
+    //   }
+    //
+    //   chosenCircle.update();
+    //   if (chosenCircle.inBounds(this.xDim, this.yDim)) {
+    //     newView.push(chosenCircle);
+    //   } else {
+    //     chosenCircle.reverse();
+    //     newView.push(chosenCircle);
+    //   }
+    // }, this);
+    //
+    // this.inView = newView;
   }
 
   animateCallback(ctx) {
-    this.update(this.inView);
+    this.update(Object.assign(this.inView));
     this.render(ctx);
     requestAnimationFrame(this.animateCallback.bind(this, ctx));
   }

@@ -1,16 +1,19 @@
 const Line = require('./line.js');
 const Vector = require('./vector.js');
 
-const RADIUS = 30;
+// const RADIUS = 30;
 const HEX_DIGITS = "0123456789ABCDEF";
 
 class Circle {
   static createRandom() {
+    const randDensity = Math.random();
+
     return new Circle(
       Vector.random([1000, 1000]),
       Vector.random([15, 15], true),
-      1,
-      Circle.randomColor()
+      randDensity * 10,
+      Circle.randomColor(),
+      10 + randDensity * 50
     );
   }
 
@@ -28,7 +31,8 @@ class Circle {
       circle.pos,
       circle.moveStep,
       circle.mass,
-      circle.color
+      circle.color,
+      circle.radius
     );
   }
 
@@ -40,10 +44,10 @@ class Circle {
   // v
   // +y
 
-  constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color = COLOR) {
+  constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color = COLOR, radius = RADIUS) {
     this.color = color;
     //starting this at a constant value
-    this.radius = RADIUS;
+    this.radius = radius;
     //corresponds to center point of circle
 
     if (startPos.constructor === Vector) {
@@ -83,6 +87,14 @@ class Circle {
       2 * Math.PI
     );
     ctx.fill();
+
+    const [dx, dy] = this.moveStep.nums;
+
+    // ctx.beginPath();
+    // ctx.moveTo(x, y);
+    // ctx.lineTo(x + 10*dx, y + 10*dy);
+    // ctx.strokeStyle = '#FF0000';
+    // ctx.stroke();
   }
 
   inBounds(xDim, yDim) {
@@ -144,50 +156,67 @@ class Circle {
   }
 
   rebound(otherCircle) {
-    if (this.angle() - otherCircle.angle() < (2 * Math.PI / 36)) {
-      const angle = Math.random() * Math.PI;
-      this.rotate(angle);
-      otherCircle.rotate(Math.PI + angle);
+    //CONSTANTS:
+    const v10x = this.x();
+    const v10y = this.y();
+    const v20x = otherCircle.x();
+    const v20y = otherCircle.y();
+
+    const initMagSq1 = Math.pow(v10x, 2) + Math.pow(v10y, 2);
+    const initMagSq2 = Math.pow(v20x, 2) + Math.pow(v20y, 2);
+
+    const m1 = this.mass;
+    const m2 = otherCircle.mass;
+    const u1 = m1 / m2;
+    const u2 = m2 / m1;
+
+    //CHOOSING RANDOM VALUE FOR: x component of final velocity of this particle
+    // const v1fx = (Math.random() * m1 * this.x() + Math.random() * m2 * otherCircle.x()) / m1;
+    const randNum = Math.random();
+    const v1fx = (randNum > 0.5) ? this.x() * randNum : this.x() * (1 + randNum);
+
+    const v2fx = u1 * v10x + v20x - u1 * v1fx;
+
+    const a = 1 + u1;
+    const b = -2 * (u1 * v10y + v20y);
+    const c = u2 * Math.pow((u1 * v10y + v20y), 2) - (
+        initMagSq1 + u2 * initMagSq2 - Math.pow(v1fx, 2) - u2 * Math.pow(v2fx, 2)
+      );
+
+    const sqrtDiscriminant = Math.sqrt(Math.abs(b*b - 4*a*c));
+    const varTerm = ((Math.random() > 0.5) ? sqrtDiscriminant : -sqrtDiscriminant);
+    const v1fy = (-b + varTerm) / (2*a);
+
+    const v2fy = u1 * v10y + v20y - u1 * v1fy;
+
+    const initMomentumX = m1 * v10x + m2 * v20x;
+    const finalMomentumX = m1 * v1fx + m2 * v2fx;
+
+    const initMomentumY = m1 * v10y + m2 * v20y;
+    const finalMomentumY = m1 * v1fy + m2 * v2fy;
+
+    const initEnergy = m1 * (v10x * v10x + v10y * v10y) + m2 * (v20x * v20x + v20y * v20y);
+    const finalEnergy = m1 * (v1fx * v1fx + v1fy * v1fy) + m2 * (v2fx * v2fx + v2fy * v2fy);
+
+    if (Math.abs(finalEnergy - initEnergy) < 0.00001) {
+      this.moveStep = new Vector([v1fx, v1fy]);
+      otherCircle.moveStep = new Vector([v2fx, v2fy]);
+      this.cannotCollide = true;
+      window.setTimeout(this.allowCollision.bind(this), 150);
     }
 
-    const totalMomentumX = this.momentumX() + otherCircle.momentumX();
-    const totalMomentumY = this.momentumY() + otherCircle.momentumY();
+  }
 
-    let randNumX;
-    let randNumY;
-    if (this.randNumX) {
-      randNumX = this.randNumX;
-      randNumY = this.randNumY;
-      delete this.randNumX;
-      delete this.randNumY;
-    } else {
-      randNumX = Math.random();
-      randNumY = Math.random();
-      otherCircle.randNumX = randNumX;
-      otherCircle.randNumY = randNumY;
-    }
+  x() {
+    return this.moveStep.x();
+  }
 
-    const newMomentumX = randNumX * totalMomentumX;
-    const newMomentumY = randNumY * totalMomentumY;
+  y() {
+    return this.moveStep.y();
+  }
 
-    let newMoveStepX = newMomentumX / this.mass;
-    let newMoveStepY = newMomentumY / this.mass;
-
-    if (this.moveStep.x() > 0) {
-      newMoveStepX = -newMoveStepX;
-    }
-
-    if (this.moveStep.y() > 0) {
-      newMoveStepY = -newMoveStepY;
-    }
-
-    this.moveStep = new Vector([
-      newMoveStepX,
-      newMoveStepY
-    ]);
-
-    this.cannotCollide = true;
-    window.setTimeout(this.allowCollision.bind(this), 150);
+  momentum() {
+    return this.moveStep.magnitude() * this.mass;
   }
 
   momentumX() {

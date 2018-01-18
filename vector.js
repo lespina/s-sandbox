@@ -55,10 +55,23 @@ class Vector {
     return Math.sqrt(result);
   }
 
+  angleBetween(otherVector) {
+    const dotProd = this.dotProduct(otherVector);
+    return Math.acos(dotProd / (this.magnitude() * otherVector.magnitude()));
+  }
+
+  dotProduct(otherVector) {
+    let result = 0;
+    for (let i=0; i<this.nums.length; i++) {
+      result += this.nums[i] + otherVector.nums[i];
+    }
+    return result;
+  }
+
   //defined as radian value of angle from the +x axis clockwise (ONLY WORKS FOR 2-D VECTORS)
   angle() {
     const [x, y] = this.nums;
-    return Math.atan2(x, y);
+    return Math.atan(y / x);
   }
 
   operate(operator, ...vectors) {
