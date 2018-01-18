@@ -124,6 +124,10 @@ class Vector {
     ];
   }
 
+  dampen(factor) {
+    this.nums = this.multiply(new Vector([factor, factor])).nums;
+  }
+
   // dampen(factor) {
   //   const dampeningArray = [];
   //   for (let i=0; i<this.nums.length; i++) {

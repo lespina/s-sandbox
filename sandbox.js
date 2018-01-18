@@ -2,22 +2,25 @@ const Circle = require('./circle');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, dampeningFactor = .95) {
+  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.999) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
+    if (gravityOn) {
+      this.gravity = new Vector([0, 1]);
+    }
 
     this.inView = {};
     for (let i=0; i<numCircles; i++) {
-      const circle = Circle.createRandom();
+      const circle = Circle.createRandom(xDim, yDim);
       circle.id = i;
       this.inView[circle.id] = circle;
     }
 
   }
 
-  static start(xDim, yDim, numCircles) {
-    const sandbox = new SandBox(xDim, yDim, numCircles);
+  static start(xDim, yDim, numCircles, gravityOn) {
+    const sandbox = new SandBox(xDim, yDim, numCircles, gravityOn);
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -39,22 +42,21 @@ class SandBox {
         const otherCircle = otherCircles[otherCircleId];
         if (!circle.cannotCollide && circleId !== otherCircleId && circle.intersectsWith(otherCircle)) {
           delete otherCircles[otherCircle];
-          // circle.moveStep.dampen(this.dampeningFactor);
-          // otherCircle.moveStep.dampen(this.dampeningFactor);
-          circle.moveStep = circle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
-          otherCircle.moveStep = otherCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
+          circle.moveStep.dampen(this.dampeningFactor);
+          otherCircle.moveStep.dampen(this.dampeningFactor);
+          // circle.moveStep = circle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
+          // otherCircle.moveStep = otherCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
           circle.rebound(otherCircle);
-          otherCircle.update();
+          otherCircle.update(this.gravity);
         }
       }
-
-      circle.update();
+      circle.update(this.gravity);
     }
 
     for (let circleId in this.inView) {
       const circle = otherCircles[circleId];
       if (!circle.inBounds(this.xDim, this.yDim)) {
-        circle.reverseOnBounds(this.xDim, this.yDim);
+        circle.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor);
       }
     }
 

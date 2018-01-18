@@ -5,15 +5,15 @@ const Vector = require('./vector.js');
 const HEX_DIGITS = "0123456789ABCDEF";
 
 class Circle {
-  static createRandom() {
-    const randDensity = 1;
+  static createRandom(xDim, yDim) {
+    const randDensity = Math.random();
 
     return new Circle(
-      Vector.random([1000, 1000]),
-      Vector.random([15, 15], true),
+      Vector.random([xDim, yDim]),
+      Vector.random([10, 10], true),
       randDensity * 10,
       Circle.randomColor(),
-      29 + randDensity
+      10 + randDensity * 30
     );
   }
 
@@ -69,7 +69,11 @@ class Circle {
     this.cannotCollide = false;
   }
 
-  update() {
+  update(acceleration) {
+    if (acceleration) {
+      this.moveStep = this.moveStep.add(acceleration);
+    }
+
     this.pos = this.pos.add(this.moveStep);
   }
 
@@ -105,15 +109,15 @@ class Circle {
     const right = [x + this.radius, y];
     const left = [x - this.radius, y];
 
-    let answer = false;
+    let answer = true;
 
     [top, bottom, left, right].forEach(pos => {
       const [x, y] = pos;
 
       if (
-        0 <= x && x <= xDim &&
-        0 <= y && y <= yDim
-      ) { answer = true; }
+        x <= 0 || xDim <= x ||
+        y <= 0 || yDim <= y
+      ) { answer = false; }
     });
 
     return answer;
@@ -142,6 +146,11 @@ class Circle {
   }
 
   intersectsWith(otherCircle) {
+    if (otherCircle.constructor === Circle) {
+      const dist = this.pos.subtract(otherCircle.pos).magnitude();
+      return (dist < this.radius + otherCircle.radius);
+    }
+
     const thisLines = this.asLines();
     const otherLines = otherCircle.asLines();
     for (let i=0; i<thisLines.length; i++) {
@@ -216,10 +225,25 @@ class Circle {
     if (Math.abs(finalEnergy - initEnergy) < 0.00001) {
       this.moveStep = new Vector([v1fx, v1fy]);
       otherCircle.moveStep = new Vector([v2fx, v2fy]);
-      this.cannotCollide = true;
-      window.setTimeout(this.allowCollision.bind(this), 150);
+    } else {
+      if (Math.random() > 0.5) {
+        this.moveStep.reverseX();
+        otherCircle.moveStep.reverseX();
+      } else {
+        this.moveStep.reverseY();
+        otherCircle.moveStep.reverseY();
+      }
     }
 
+    // let dist = this.pos.subtract(otherCircle.pos).magnitude();
+    // while (dist < this.radius + otherCircle.radius) {
+    //   this.update();
+    //   otherCircle.update();
+    //   dist = this.pos.subtract(otherCircle.pos).magnitude();
+    // }
+
+    this.cannotCollide = true;
+    window.setTimeout(this.allowCollision.bind(this), 150);
   }
 
   x() {
@@ -246,14 +270,30 @@ class Circle {
     this.moveStep.reverse();
   }
 
-  reverseOnBounds(xDim, yDim) {
+  reverseOnBounds(xDim, yDim, dampeningFactor) {
     const [x, y] = [this.pos.x(), this.pos.y()];
-    if (x <= 0 || xDim <= x) {
+    if (x <= this.radius) {
+      this.pos.nums[0] = this.radius;
+      this.moveStep.reverseX();
+    } else if (xDim <= x + this.radius) {
+      this.pos.nums[0] = xDim - this.radius;
       this.moveStep.reverseX();
     }
 
-    if (y <= 0 || yDim <= y) {
+    if (y <= this.radius) {
+      this.pos.nums[1] = this.radius;
       this.moveStep.reverseY();
+    } else if (yDim <= y + this.radius) {
+      this.pos.nums[1] = yDim - this.radius;
+      this.moveStep.reverseY();
+    }
+
+    this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
+    if (Math.abs(this.moveStep.x()) < 0.1) {
+      this.moveStep.nums[x] = 0;
+    }
+    if (Math.abs(this.moveStep.y()) < 0.1) {
+      this.moveStep.nums[y] = 0;
     }
   }
 
