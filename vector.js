@@ -1,5 +1,8 @@
 class Vector {
   constructor(arg1, arg2) {
+    if (arg1.constructor === Vector) {
+      return new Vector(arg1.nums);
+    }
     if (arg2 === undefined) {
       this.nums = arg1;
     } else {
@@ -32,6 +35,24 @@ class Vector {
   reverseY() {
     const [x, y] = this.nums;
     this.nums = [x, -y];
+  }
+
+  signX(positive) {
+    const [x, y] = this.nums;
+    if (positive) {
+      this.nums = [Math.abs(x), y];
+    } else {
+      this.nums = [-Math.abs(x), y];
+    }
+  }
+
+  signY(positive) {
+    const [x, y] = this.nums;
+    if (positive) {
+      this.nums = [x, Math.abs(y)];
+    } else {
+      this.nums = [x, -Math.abs(y)];
+    }
   }
 
   static random(bounds, includeNegatives) {

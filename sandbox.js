@@ -16,7 +16,7 @@ class SandBox {
       circle.id = i;
       this.inView[circle.id] = circle;
     }
-
+    this.nextId = Object.keys(this.inView).length;
   }
 
   static start(xDim, yDim, numCircles, gravityOn) {
@@ -25,6 +25,11 @@ class SandBox {
     const ctx = canvas.getContext("2d");
 
     sandbox.animateCallback(ctx);
+    return sandbox;
+  }
+
+  add(body) {
+    this.inView[this.nextId++] = body;
   }
 
   render(ctx) {

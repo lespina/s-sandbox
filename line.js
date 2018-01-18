@@ -9,6 +9,14 @@ class Line {
     this.end = {x ,y};
   }
 
+  maxX() {
+    return Math.max(this.start.x, this.end.x);
+  }
+
+  maxY() {
+    return Math.max(this.start.y, this.end.y);
+  }
+
   intersectsWith(otherLine) {
     return LineIntersection.isSegmentIntersected(
       [

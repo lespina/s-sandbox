@@ -1,9 +1,12 @@
 const SandBox = require('./sandbox.js');
 const Circle = require('./circle.js');
+const Body = require('./body.js');
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('click', () => {
-    SandBox.start(1000, 600, 50, true);
+  const [xDim, yDim] = [1000, 600];
+  const s = SandBox.start(xDim, yDim, 3, true);
+  document.addEventListener('click', (e) => {
+    s.add(Body.createRandom(xDim, yDim, e.x, e.y));
   });
   // window.setInterval(SandBox.start.bind(SandBox, 1000, 1000), 2500);
 });

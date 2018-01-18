@@ -1,29 +1,20 @@
 const Line = require('./line.js');
 const Vector = require('./vector.js');
+const Body = require('./body.js');
 
-// const RADIUS = 30;
-const HEX_DIGITS = "0123456789ABCDEF";
+const RADIUS = 30;
 
-class Circle {
-  static createRandom(xDim, yDim) {
-    const randDensity = Math.random();
+class Circle extends Body {
+  static createRandom(xDim, yDim, x, y, radius) {
+    return Body.createRandom(xDim, yDim, x, y, { radius });
 
-    return new Circle(
-      Vector.random([xDim, yDim]),
-      Vector.random([10, 10], true),
-      randDensity * 10,
-      Circle.randomColor(),
-      10 + randDensity * 30
-    );
-  }
-
-  static randomColor() {
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += HEX_DIGITS[Math.floor((Math.random() * 16))];
-    }
-
-    return color;
+    // return new Circle(
+    //   pos,
+    //   Vector.random([10, 10], true),
+    //   randDensity * 10,
+    //   Circle.randomColor(),
+    //   10 + randDensity * 30
+    // );
   }
 
   static copy(circle) {
@@ -44,37 +35,8 @@ class Circle {
   // v
   // +y
 
-  constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color = COLOR, radius = RADIUS) {
-    this.color = color;
-    //starting this at a constant value
-    this.radius = radius;
-    //corresponds to center point of circle
-
-    if (startPos.constructor === Vector) {
-      this.pos = startPos;
-    } else {
-      this.pos = new Vector(startPos);
-    }
-
-    if (startVel.constructor === Vector) {
-      this.moveStep = startVel;
-    } else {
-      this.moveStep = new Vector(startVel);
-    }
-
-    this.mass = mass;
-  }
-
-  allowCollision() {
-    this.cannotCollide = false;
-  }
-
-  update(acceleration) {
-    if (acceleration) {
-      this.moveStep = this.moveStep.add(acceleration);
-    }
-
-    this.pos = this.pos.add(this.moveStep);
+  constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color, radius = RADIUS) {
+    super(startPos, startVel, mass, color, { radius });
   }
 
   render(ctx) {
@@ -92,13 +54,6 @@ class Circle {
     );
     ctx.fill();
 
-    const [dx, dy] = this.moveStep.nums;
-
-    // ctx.beginPath();
-    // ctx.moveTo(x, y);
-    // ctx.lineTo(x + 10*dx, y + 10*dy);
-    // ctx.strokeStyle = '#FF0000';
-    // ctx.stroke();
   }
 
   inBounds(xDim, yDim) {
@@ -156,7 +111,7 @@ class Circle {
     for (let i=0; i<thisLines.length; i++) {
       for (let j=0; j<otherLines.length; j++) {
         if (thisLines[i].intersectsWith(otherLines[j])) {
-          return true;
+          return otherLines[j];
         }
       }
     }
@@ -226,7 +181,7 @@ class Circle {
       this.moveStep = new Vector([v1fx, v1fy]);
       otherCircle.moveStep = new Vector([v2fx, v2fy]);
     } else {
-      if (Math.random() > 0.5) {
+      if (Math.random() > 0.5 || Math.abs(600 - this.pos.y() < 5)) {
         this.moveStep.reverseX();
         otherCircle.moveStep.reverseX();
       } else {
