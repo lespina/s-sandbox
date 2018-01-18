@@ -23,6 +23,15 @@ class Circle {
     return color;
   }
 
+  static copy(circle) {
+    return new Circle(
+      circle.pos,
+      circle.moveStep,
+      circle.mass,
+      circle.color
+    );
+  }
+
   // positions are represented as [x, y] tuples corresponding to
   //  ----------> +x
   // |
@@ -50,12 +59,6 @@ class Circle {
     }
 
     this.mass = mass;
-  }
-
-  rebound() {
-    this.moveStep.reverse();
-    this.cannotCollide = true;
-    window.setTimeout(this.allowCollision.bind(this), 150);
   }
 
   allowCollision() {
@@ -138,6 +141,20 @@ class Circle {
     }
 
     return false;
+  }
+
+  rebound() {
+    this.moveStep.reverse();
+    this.cannotCollide = true;
+    window.setTimeout(this.allowCollision.bind(this), 150);
+  }
+
+  momentumX() {
+    return this.moveStep.x() * this.mass;
+  }
+
+  momentumY() {
+    return this.moveStep.y() * this.mass;
   }
 
 }

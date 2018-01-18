@@ -11,6 +11,14 @@ class Vector {
     }
   }
 
+  x() {
+    return this.nums[0];
+  }
+
+  y() {
+    return this.nums[1];
+  }
+
   reverse() {
     const [x, y] = this.nums;
     this.nums = [-x, -y];

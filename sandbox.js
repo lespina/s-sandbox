@@ -10,6 +10,7 @@ class SandBox {
       const circle = Circle.createRandom();
       this.inView.push(circle);
     }
+
   }
 
   static start(xDim, yDim, numCircles) {
@@ -30,16 +31,24 @@ class SandBox {
   update(otherCircles) {
     const newView = [];
     this.inView.forEach((circle, i) => {
+      let newCircle;
       otherCircles.forEach((otherCircle, j) => {
         if (!circle.cannotCollide && i !== j && circle.intersectsWith(otherCircle)) {
-          circle.rebound();
+          newCircle = Circle.copy(circle);
+          newCircle.rebound();
         }
       });
 
+      let chosenCircle;
+      if (newCircle) {
+        chosenCircle = newCircle;
+      } else {
+        chosenCircle = circle;
+      }
 
-      circle.update();
-      if (circle.inBounds(this.xDim, this.yDim)) {
-        newView.push(circle);
+      chosenCircle.update();
+      if (chosenCircle.inBounds(this.xDim, this.yDim)) {
+        newView.push(chosenCircle);
       }
     }, this);
 
