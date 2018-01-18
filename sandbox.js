@@ -2,7 +2,7 @@ const Circle = require('./circle');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, dampeningFactor = 1) {
+  constructor(xDim, yDim, numCircles, dampeningFactor = .95) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
@@ -39,6 +39,10 @@ class SandBox {
         const otherCircle = otherCircles[otherCircleId];
         if (!circle.cannotCollide && circleId !== otherCircleId && circle.intersectsWith(otherCircle)) {
           delete otherCircles[otherCircle];
+          // circle.moveStep.dampen(this.dampeningFactor);
+          // otherCircle.moveStep.dampen(this.dampeningFactor);
+          circle.moveStep = circle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
+          otherCircle.moveStep = otherCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
           circle.rebound(otherCircle);
           otherCircle.update();
         }

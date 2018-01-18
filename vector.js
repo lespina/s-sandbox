@@ -31,7 +31,7 @@ class Vector {
 
   reverseY() {
     const [x, y] = this.nums;
-    this.nums = [x, -y]; 
+    this.nums = [x, -y];
   }
 
   static random(bounds, includeNegatives) {
@@ -123,6 +123,15 @@ class Vector {
       -x * Math.sin(angle) + y * Math.cos(angle)
     ];
   }
+
+  // dampen(factor) {
+  //   const dampeningArray = [];
+  //   for (let i=0; i<this.nums.length; i++) {
+  //     dampeningArray.push(factor);
+  //   }
+  //   const vector = new Vector(dampeningArray);
+  //   this.multiply(vector);
+  // }
 }
 
 module.exports = Vector;
