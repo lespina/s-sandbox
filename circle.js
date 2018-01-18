@@ -8,7 +8,7 @@ class Circle {
   static createRandom() {
     return new Circle(
       Vector.random([1000, 1000]),
-      Vector.random([10, 10], true),
+      Vector.random([15, 15], true),
       1,
       Circle.randomColor()
     );
@@ -107,7 +107,7 @@ class Circle {
     return answer;
   }
 
-  asLines(numLines = 6) {
+  asLines(numLines = 8) {
     const [x, y] = this.pos.to_a();
 
     const lines = [];
@@ -143,18 +143,53 @@ class Circle {
     return false;
   }
 
-  rebound() {
-    this.moveStep.reverse();
+  rebound(otherCircle) {
+    const totalMomentumX = this.momentumX() + otherCircle.momentumX();
+    const totalMomentumY = this.momentumY() + otherCircle.momentumY();
+
+    let randNumX;
+    let randNumY;
+    if (this.randNumX) {
+      randNumX = this.randNumX;
+      randNumY = this.randNumY;
+      delete this.randNumX;
+      delete this.randNumY;
+    } else {
+      randNumX = Math.random();
+      randNumY = Math.random();
+      otherCircle.randNumX = randNumX;
+      otherCircle.randNumY = randNumY;
+    }
+
+    const newMomentumX = randNumX * totalMomentumX;
+    const newMomentumY = randNumY * totalMomentumY;
+
+    let newMoveStepX = newMomentumX / this.mass;
+    let newMoveStepY = newMomentumY / this.mass;
+
+    if (this.moveStep.x() > 0) {
+      newMoveStepX = -newMoveStepX;
+    }
+
+    if (this.moveStep.y() > 0) {
+      newMoveStepY = -newMoveStepY;
+    }
+
+    this.moveStep = new Vector([
+      newMoveStepX,
+      newMoveStepY
+    ]);
+
     this.cannotCollide = true;
     window.setTimeout(this.allowCollision.bind(this), 150);
   }
 
   momentumX() {
-    return this.moveStep.x() * this.mass;
+    return Math.abs(this.moveStep.x() * this.mass);
   }
 
   momentumY() {
-    return this.moveStep.y() * this.mass;
+    return Math.abs(this.moveStep.y() * this.mass);
   }
 
 }

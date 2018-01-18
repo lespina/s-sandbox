@@ -35,7 +35,7 @@ class SandBox {
       otherCircles.forEach((otherCircle, j) => {
         if (!circle.cannotCollide && i !== j && circle.intersectsWith(otherCircle)) {
           newCircle = Circle.copy(circle);
-          newCircle.rebound();
+          newCircle.rebound(otherCircle);
         }
       });
 
