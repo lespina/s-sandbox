@@ -24,6 +24,16 @@ class Vector {
     this.nums = [-x, -y];
   }
 
+  reverseX() {
+    const [x, y] = this.nums;
+    this.nums = [-x, y];
+  }
+
+  reverseY() {
+    const [x, y] = this.nums;
+    this.nums = [x, -y]; 
+  }
+
   static random(bounds, includeNegatives) {
     const nums = [];
     if (includeNegatives) {

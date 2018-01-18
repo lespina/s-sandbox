@@ -50,7 +50,7 @@ class SandBox {
     for (let circleId in this.inView) {
       const circle = otherCircles[circleId];
       if (!circle.inBounds(this.xDim, this.yDim)) {
-        circle.reverse();
+        circle.reverseOnBounds(this.xDim, this.yDim);
       }
     }
 

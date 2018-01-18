@@ -6,14 +6,14 @@ const HEX_DIGITS = "0123456789ABCDEF";
 
 class Circle {
   static createRandom() {
-    const randDensity = Math.random();
+    const randDensity = 1;
 
     return new Circle(
       Vector.random([1000, 1000]),
       Vector.random([15, 15], true),
       randDensity * 10,
       Circle.randomColor(),
-      10 + randDensity * 50
+      29 + randDensity
     );
   }
 
@@ -244,6 +244,17 @@ class Circle {
 
   reverse() {
     this.moveStep.reverse();
+  }
+
+  reverseOnBounds(xDim, yDim) {
+    const [x, y] = [this.pos.x(), this.pos.y()];
+    if (x <= 0 || xDim <= x) {
+      this.moveStep.reverseX();
+    }
+
+    if (y <= 0 || yDim <= y) {
+      this.moveStep.reverseY();
+    }
   }
 
   angle() {
