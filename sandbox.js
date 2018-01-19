@@ -1,4 +1,5 @@
 const Circle = require('./circle');
+const Square = require('./square');
 const Vector = require('./vector');
 
 class SandBox {

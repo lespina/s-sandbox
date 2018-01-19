@@ -7,7 +7,7 @@ const RADIUS = 30;
 class Circle extends Body {
   static createRandom(xDim, yDim, x, y, radius) {
     radius = radius || Math.random() * 50 + 10;
-    return Body.createRandom.call(this, xDim, yDim, x, y, radius);
+    return Body.createRandom.call(this, xDim, yDim, x, y, radius, radius);
   }
 
   static copy(circle) {
@@ -16,7 +16,6 @@ class Circle extends Body {
       circle.moveStep,
       circle.mass,
       circle.color,
-      circle.radius,
       circle.radius
     );
   }
@@ -80,30 +79,6 @@ class Circle extends Body {
     //   otherCircle.update();
     //   dist = this.pos.subtract(otherCircle.pos).magnitude();
     // }
-
-  x() {
-    return this.moveStep.x();
-  }
-
-  y() {
-    return this.moveStep.y();
-  }
-
-  momentum() {
-    return this.moveStep.magnitude() * this.mass;
-  }
-
-  momentumX() {
-    return Math.abs(this.moveStep.x() * this.mass);
-  }
-
-  momentumY() {
-    return Math.abs(this.moveStep.y() * this.mass);
-  }
-
-  reverse() {
-    this.moveStep.reverse();
-  }
 
   reverseOnBounds(xDim, yDim, dampeningFactor) {
     const [x, y] = [this.pos.x(), this.pos.y()];
