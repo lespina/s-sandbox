@@ -6,8 +6,10 @@ const COLOR = "#FF0000";
 const HEX_DIGITS = "0123456789ABCDEF";
 
 class Body {
-  static createRandom(xDim, yDim, x, y, options) {
+  static createRandom(xDim, yDim, x, y, options, mass) {
     const randDensity = Math.random();
+
+    mass = mass || randDensity * 10;
 
     let pos;
     if (x) {
@@ -18,7 +20,7 @@ class Body {
 
     options = options || { size: 10 };
 
-    return new this.constructor(
+    return new this(
       pos,
       Vector.random([10, 10], true),
       randDensity * 10,
@@ -150,7 +152,8 @@ class Body {
 
   chooseV1fx(otherBody) {
     const randNum = Math.random();
-    const newVel = Math.abs(randNum > 0.5) ? this.x() * randNum : this.x() * (1 + randNum);
+    const newVel = Math.abs((this.x() + this.y()) * randNum);
+    // const newVel = Math.abs(randNum > 0.5) ? (this.x() * randNum : this.x() * (1 + randNum);
 
     const thisMomentum = this.mass * this.x();
     const otherMomentum = otherBody.mass * otherBody.x();
@@ -197,11 +200,11 @@ class Body {
 
     const v2fy = u1 * v10y + v20y - u1 * v1fy;
 
-    const initMomentumX = m1 * v10x + m2 * v20x;
-    const finalMomentumX = m1 * v1fx + m2 * v2fx;
-
-    const initMomentumY = m1 * v10y + m2 * v20y;
-    const finalMomentumY = m1 * v1fy + m2 * v2fy;
+    // const initMomentumX = m1 * v10x + m2 * v20x;
+    // const finalMomentumX = m1 * v1fx + m2 * v2fx;
+    //
+    // const initMomentumY = m1 * v10y + m2 * v20y;
+    // const finalMomentumY = m1 * v1fy + m2 * v2fy;
 
     const initEnergy = m1 * (v10x * v10x + v10y * v10y) + m2 * (v20x * v20x + v20y * v20y);
     const finalEnergy = m1 * (v1fx * v1fx + v1fy * v1fy) + m2 * (v2fx * v2fx + v2fy * v2fy);
@@ -323,6 +326,7 @@ class Body {
       this.moveStep.nums[y] = 0;
     }
   }
+
 }
 
 module.exports = Body;
