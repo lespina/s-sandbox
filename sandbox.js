@@ -3,7 +3,7 @@ const Square = require('./square');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.95) {
+  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.99) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
@@ -34,11 +34,11 @@ class SandBox {
 
   toggleGravity() {
     this.gravity = !this.gravity;
-    // if (this.gravity) {
-    //   this.gravity = new Vector([0, 0]);
-    // } else {
-    //   this.gravity = new Vector([0, 1]);
-    // }
+  }
+
+  removeForces() {
+    this.gravity = false;
+    this.attractiveForce = () => new Vector([0, 0]);
   }
 
   rotateGravity() {
@@ -66,7 +66,7 @@ class SandBox {
 
   render(ctx) {
     ctx.clearRect(0, 0, this.xDim, this.yDim);
-    ctx.fillStyle = '#89cff0';
+    ctx.fillStyle = '#ADD8E6';
     ctx.fillRect(0, 0, this.xDim, this.yDim);
     Object.values(this.inView).forEach(circle => {
       circle.render(ctx);

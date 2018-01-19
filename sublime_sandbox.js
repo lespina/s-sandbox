@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
       case 71:
         s.toggleGravity();
         break;
+      case 82:
+        s.removeForces();
+        break;
     }
   });
   document.addEventListener('click', s.setAttractor.bind(s));

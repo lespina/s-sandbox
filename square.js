@@ -7,7 +7,7 @@ const SIDESIZE = 30;
 class Square extends Body {
   static createRandom(xDim, yDim, x, y, sideSize) {
     sideSize = sideSize || Math.random() * 50 + 10;
-    return Body.createRandom.call(this, xDim, yDim, x, y, sideSize);
+    return Body.createRandom.call(this, xDim, yDim, x, y, sideSize, sideSize);
   }
 
   static copy(square) {
