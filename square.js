@@ -31,10 +31,6 @@ class Square extends Body {
 
     ctx.beginPath();
     ctx.fillRect(x - size / 2, y - size / 2, size, size);
-
-    ctx.beginPath();
-    ctx.fillStyle = '#FF0000';
-    ctx.fillRect(x, y, 3, 3);
   }
 
   inBounds(xDim, yDim) {

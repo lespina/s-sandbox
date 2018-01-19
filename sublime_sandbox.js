@@ -15,8 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const s = SandBox.start(xDim, yDim, 3, true);
   document.addEventListener('keyup', (e) => {
     e.preventDefault();
-    if (e.keyCode === 32) {
-      s.add(shuffle(bodies)[0].createRandom(xDim, yDim));
+    switch (e.keyCode) {
+      case 32:
+        s.add(shuffle(bodies)[0].createRandom(xDim, yDim));
+        break;
+      case 71:
+        s.toggleGravity();
+        break;
     }
   });
   document.addEventListener('click', s.setAttractor.bind(s));

@@ -7,6 +7,7 @@ class SandBox {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
+    this.gravity = gravityOn;//((gravityOn) ? new Vector([0, 1]) : new Vector([0, 0]));
     // if (gravityOn) {
     //   this.gravity = new Vector([0, 1]);
     //   window.setInterval(this.rotateGravity.call(this), 5000);
@@ -22,14 +23,22 @@ class SandBox {
   }
 
   setAttractor(e) {
-    const mousePos = new Vector(e.x, e.y);
-    console.log(mousePos.toArr());
+    const mousePos = new Vector([e.x, e.y]);
     this.attractiveForce = function() {
       const attractiveForce = mousePos.subtract(this.pos);
       const mag = attractiveForce.magnitude();
       attractiveForce.dampen(1/mag);
       return attractiveForce;
     };
+  }
+
+  toggleGravity() {
+    this.gravity = !this.gravity;
+    // if (this.gravity) {
+    //   this.gravity = new Vector([0, 0]);
+    // } else {
+    //   this.gravity = new Vector([0, 1]);
+    // }
   }
 
   rotateGravity() {
@@ -57,12 +66,15 @@ class SandBox {
 
   render(ctx) {
     ctx.clearRect(0, 0, this.xDim, this.yDim);
+    ctx.fillStyle = '#89cff0';
+    ctx.fillRect(0, 0, this.xDim, this.yDim);
     Object.values(this.inView).forEach(circle => {
       circle.render(ctx);
     });
   }
 
   update(otherCircles) {
+    const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
     for (let circleId in otherCircles) {
       const circle = otherCircles[circleId];
 
@@ -72,13 +84,12 @@ class SandBox {
           delete otherCircles[otherCircle];
           circle.moveStep.dampen(this.dampeningFactor);
           otherCircle.moveStep.dampen(this.dampeningFactor);
-          // circle.moveStep = circle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
-          // otherCircle.moveStep = otherCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
+
           circle.rebound(otherCircle);
-          otherCircle.update(this.attractiveForce.call(otherCircle));
+          otherCircle.update(this.attractiveForce.call(otherCircle).add(gravity));
         }
       }
-      circle.update(this.attractiveForce.call(circle));
+      circle.update(this.attractiveForce.call(circle).add(gravity));
     }
 
     for (let circleId in this.inView) {
