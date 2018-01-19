@@ -29,7 +29,7 @@ class Circle extends Body {
     ctx.fillStyle = this.color;
     ctx.beginPath();
 
-    const [x, y] = this.pos.to_a();
+    const [x, y] = this.pos.toArr();
 
     ctx.arc(
       x,
@@ -43,7 +43,7 @@ class Circle extends Body {
   }
 
   asLines(numLines = 8) {
-    const [x, y] = this.pos.to_a();
+    const [x, y] = this.pos.toArr();
 
     const lines = [];
     const angleIncrement = 2 * Math.PI / numLines;
@@ -55,7 +55,7 @@ class Circle extends Body {
       const points = [point.slice(0)];
       const relativeVec = new Vector(this.radius, angle);
       const vec = this.pos.add(relativeVec);
-      point = vec.to_a();
+      point = vec.toArr();
       angle += angleIncrement;
       points.push(point.slice(0));
       lines.push(new Line(...points));

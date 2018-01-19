@@ -9,8 +9,16 @@ class Line {
     this.end = {x ,y};
   }
 
+  minX() {
+    return Math.min(this.start.x, this.end.x);
+  }
+
   maxX() {
     return Math.max(this.start.x, this.end.x);
+  }
+
+  minY() {
+    return Math.min(this.start.y, this.end.y);
   }
 
   maxY() {

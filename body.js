@@ -1,6 +1,7 @@
 const Line = require('./line.js');
 const Vector = require('./vector.js');
 const _ = require('lodash');
+const Circle = require('./circle.js');
 
 const COLOR = "#FF0000";
 const HEX_DIGITS = "0123456789ABCDEF";
@@ -90,7 +91,7 @@ class Body {
     ctx.fillStyle = this.color;
     ctx.beginPath();
 
-    const [x, y] = this.pos.to_a();
+    const [x, y] = this.pos.toArr();
 
     ctx.arc(
       x,
@@ -111,7 +112,7 @@ class Body {
   }
 
   inBounds(xDim, yDim) {
-    const [x, y] = this.pos.to_a();
+    const [x, y] = this.pos.toArr();
 
     const top = [x, y + this.radius];
     const bottom = [x, y - this.radius];
@@ -138,7 +139,7 @@ class Body {
     for (let i=0; i<thisLines.length; i++) {
       for (let j=0; j<otherLines.length; j++) {
         if (thisLines[i].intersectsWith(otherLines[j])) {
-          return true;
+          return otherLines[j];
         }
       }
     }
@@ -254,78 +255,78 @@ class Body {
     this.moveStep.rotate(angle);
   }
 
-  // reverseOnBounds(xDim, yDim, dampeningFactor) {
-  //   const top = new Line([0, 0], [xDim, 0]);
-  //   top.side = 'TOP';
-  //   const bottom = new Line([0, yDim], [xDim, yDim]);
-  //   bottom.side = 'BOTTOM';
-  //   const left = new Line([0, 0], [0, yDim]);
-  //   left.side = 'LEFT';
-  //   const right = new Line([xDim, 0], [xDim, yDim]);
-  //   right.side = 'RIGHT';
-  //
-  //   const boundsBody = { asLines: () => [top, bottom, left, right] };
-  //   const intersectedLine = this.intersectsWith(boundsBody);
-  //   debugger
-  //   if (intersectedLine) {
-  //     switch (intersectedLine.side) {
-  //       case 'TOP':
-  //         this.pos.nums[1] = 0;
-  //         this.moveStep.signY(true);
-  //         break;
-  //       case 'BOTTOM':
-  //         this.pos.nums[1] = yDim;
-  //         this.moveStep.signY(false);
-  //         break;
-  //       case 'LEFT':
-  //         this.pos.nums[0] = 0;
-  //         this.moveStep.signX(true);
-  //         break;
-  //       case 'RIGHT':
-  //         this.pos.nums[0] = xDim;
-  //         this.moveStep.signX(false);
-  //         break;
-  //       default:
-  //         alert('bounds error');
-  //     }
-  //   }
-  //
-  //   this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
-  //   if (Math.abs(this.moveStep.x()) < 0.1) {
-  //     this.moveStep.nums[0] = 0;
-  //   }
-  //   if (Math.abs(this.moveStep.y()) < 0.1) {
-  //     this.moveStep.nums[1] = 0;
-  //   }
-  // }
-
   reverseOnBounds(xDim, yDim, dampeningFactor) {
-    const [x, y] = [this.pos.x(), this.pos.y()];
+    const top = new Line([0, 0], [xDim, 0]);
+    top.side = 'TOP';
+    const bottom = new Line([0, yDim], [xDim, yDim]);
+    bottom.side = 'BOTTOM';
+    const left = new Line([0, 0], [0, yDim]);
+    left.side = 'LEFT';
+    const right = new Line([xDim, 0], [xDim, yDim]);
+    right.side = 'RIGHT';
 
-    if (x <= 0) {
-      this.pos.nums[0] = 0;
-      this.moveStep.reverseX();
-    } else if (xDim <= x) {
-      this.pos.nums[0] = xDim;
-      this.moveStep.reverseX();
-    }
+    const boundsBody = { asLines: () => [top, bottom, left, right] };
+    const intersectedLine = this.intersectsWith(boundsBody);
 
-    if (y <= 0) {
-      this.pos.nums[1] = 0;
-      this.moveStep.reverseY();
-    } else if (yDim <= y) {
-      this.pos.nums[1] = yDim;
-      this.moveStep.reverseY();
+    if (intersectedLine) {
+      switch (intersectedLine.side) {
+        case 'TOP':
+          this.pos.nums[1] = 0;
+          this.moveStep.signY(true);
+          break;
+        case 'BOTTOM':
+          this.pos.nums[1] = yDim;
+          this.moveStep.signY(false);
+          break;
+        case 'LEFT':
+          this.pos.nums[0] = 0;
+          this.moveStep.signX(true);
+          break;
+        case 'RIGHT':
+          this.pos.nums[0] = xDim;
+          this.moveStep.signX(false);
+          break;
+        default:
+          alert('bounds error');
+      }
     }
 
     this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
     if (Math.abs(this.moveStep.x()) < 0.1) {
-      this.moveStep.nums[x] = 0;
+      this.moveStep.nums[0] = 0;
     }
     if (Math.abs(this.moveStep.y()) < 0.1) {
-      this.moveStep.nums[y] = 0;
+      this.moveStep.nums[1] = 0;
     }
   }
+
+  // reverseOnBounds(xDim, yDim, dampeningFactor) {
+  //   const [x, y] = [this.pos.x(), this.pos.y()];
+  //
+  //   if (x <= 0) {
+  //     this.pos.nums[0] = 0;
+  //     this.moveStep.reverseX();
+  //   } else if (xDim <= x) {
+  //     this.pos.nums[0] = xDim;
+  //     this.moveStep.reverseX();
+  //   }
+  //
+  //   if (y <= 0) {
+  //     this.pos.nums[1] = 0;
+  //     this.moveStep.reverseY();
+  //   } else if (yDim <= y) {
+  //     this.pos.nums[1] = yDim;
+  //     this.moveStep.reverseY();
+  //   }
+  //
+  //   this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
+  //   if (Math.abs(this.moveStep.x()) < 0.1) {
+  //     this.moveStep.nums[x] = 0;
+  //   }
+  //   if (Math.abs(this.moveStep.y()) < 0.1) {
+  //     this.moveStep.nums[y] = 0;
+  //   }
+  // }
 
 }
 

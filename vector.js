@@ -73,7 +73,7 @@ class Vector {
     return new Vector(nums);
   }
 
-  to_a() {
+  toArr() {
     return this.nums.slice(0);
   }
 

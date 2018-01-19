@@ -3,14 +3,15 @@ const Square = require('./square');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.999) {
+  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.95) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
-    if (gravityOn) {
-      this.gravity = new Vector([0, 1]);
-    }
-
+    // if (gravityOn) {
+    //   this.gravity = new Vector([0, 1]);
+    //   window.setInterval(this.rotateGravity.call(this), 5000);
+    // }
+    this.attractiveForce = () => new Vector([0, 0]);
     this.inView = {};
     for (let i=0; i<numCircles; i++) {
       const circle = Circle.createRandom(xDim, yDim);
@@ -18,6 +19,27 @@ class SandBox {
       this.inView[circle.id] = circle;
     }
     this.nextId = Object.keys(this.inView).length;
+  }
+
+  setAttractor(e) {
+    const mousePos = new Vector(e.x, e.y);
+    console.log(mousePos.toArr());
+    this.attractiveForce = function() {
+      const attractiveForce = mousePos.subtract(this.pos);
+      const mag = attractiveForce.magnitude();
+      attractiveForce.dampen(1/mag);
+      return attractiveForce;
+    };
+  }
+
+  rotateGravity() {
+    const forces = [
+      [0, 1], [1, 0], [0, -1], [-1, 0]
+    ];
+    return () => {
+      forces.unshift(forces.pop());
+      this.gravity = new Vector(forces[0]);
+    };
   }
 
   static start(xDim, yDim, numCircles, gravityOn) {
@@ -53,10 +75,10 @@ class SandBox {
           // circle.moveStep = circle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
           // otherCircle.moveStep = otherCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
           circle.rebound(otherCircle);
-          otherCircle.update(this.gravity);
+          otherCircle.update(this.attractiveForce.call(otherCircle));
         }
       }
-      circle.update(this.gravity);
+      circle.update(this.attractiveForce.call(circle));
     }
 
     for (let circleId in this.inView) {
