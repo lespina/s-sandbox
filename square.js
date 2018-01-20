@@ -83,16 +83,16 @@ class Square extends Body {
 
     this.asLines().forEach(line => {
       if (line.maxX() > right) {
-        this.pos.nums[0] = xDim - this.sideSize;
+        this.pos.nums[0] = xDim - this.sideSize / 2;
         this.moveStep.signX(false);
       } else if (line.minX() < left) {
-        this.pos.nums[0] = this.sideSize;
+        this.pos.nums[0] = this.sideSize / 2;
         this.moveStep.signX(true);
       } else if (line.minY() > bottom) {
-        this.pos.nums[1] = yDim - this.sideSize;
+        this.pos.nums[1] = yDim - this.sideSize / 2;
         this.moveStep.signY(false);
       } else if (line.minY() < top) {
-        this.pos.nums[1] = this.sideSize;
+        this.pos.nums[1] = this.sideSize / 2;
         this.moveStep.signY(true);
       }
     });
