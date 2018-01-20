@@ -59,7 +59,9 @@ class Body {
       this[key] = options[key];
     }
     this.acceleration = new Vector([0,0]);
+
     this.orientation = 0;
+    this.orientMoveStep = (Math.random() > 0.5) ? 0.1 : -0.1;
   }
 
   allowCollision() {
@@ -68,6 +70,10 @@ class Body {
 
   updatePosition() {
     this.pos = this.pos.add(this.moveStep);
+  }
+
+  updateOrientation() {
+    this.orientation += this.orientMoveStep;
   }
 
   updateVelocity() {
@@ -85,6 +91,7 @@ class Body {
     }
 
     this.updatePosition();
+    this.updateOrientation();
     this.updateVelocity();
   }
 

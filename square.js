@@ -30,8 +30,7 @@ class Square extends Body {
     const [x, y] = this.pos.toArr();
     ctx.fillStyle = this.color;
 
-    ctx.beginPath();
-    ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    this.drawRot(ctx);
 
     let orientation = new Vector(this.sideSize / 2, this.orientation);
     for (let i=0; i<4; i++) {
@@ -43,6 +42,23 @@ class Square extends Body {
       ctx.stroke();
       orientation.rotate(Math.PI / 2);
     }
+  }
+
+  drawRot(ctx){
+    const [x, y] = this.pos.toArr();
+
+    //Set the origin to the center of the image
+    ctx.translate(x, y);
+
+    //Rotate the canvas around the origin
+    ctx.rotate(this.orientation);
+
+    //draw the image
+    ctx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize, this.sideSize);
+
+    //reset the canvas
+    ctx.rotate(-this.orientation);
+    ctx.translate(-x, -y);
   }
 
   intersectsWith(otherBody) {

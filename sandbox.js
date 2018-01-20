@@ -15,7 +15,7 @@ class SandBox {
     this.attractiveForce = () => new Vector([0, 0]);
     this.inView = {};
     for (let i=0; i<numCircles; i++) {
-      const circle = Circle.createRandom(xDim, yDim);
+      const circle = Square.createRandom(xDim, yDim);
       circle.id = i;
       this.inView[circle.id] = circle;
     }
