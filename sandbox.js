@@ -4,21 +4,21 @@ const Square = require('./square');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.98) {
+  constructor(xDim, yDim, numBodies, gravityOn, dampeningFactor = 0.98) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
-    this.gravity = gravityOn;//((gravityOn) ? new Vector([0, 1]) : new Vector([0, 0]));
+    this.gravity = gravityOn;
     // if (gravityOn) {
     //   this.gravity = new Vector([0, 1]);
     //   window.setInterval(this.rotateGravity.call(this), 5000);
     // }
     this.attractiveForce = () => new Vector([0, 0]);
     this.inView = {};
-    for (let i=0; i<numCircles; i++) {
-      const circle = shuffle([Square, Circle])[0].createRandom(xDim, yDim);
-      circle.id = i;
-      this.inView[circle.id] = circle;
+    for (let i=0; i<numBodies; i++) {
+      const body = shuffle([Circle, Square])[0].createRandom(xDim, yDim);
+      body.id = i;
+      this.inView[body.id] = body;
     }
     this.nextId = Object.keys(this.inView).length;
   }
@@ -62,6 +62,7 @@ class SandBox {
   }
 
   add(body) {
+    body.id = this.nextId;
     this.inView[this.nextId++] = body;
   }
 

@@ -62,7 +62,7 @@ class Body {
 
     this.orientation = 0;
     const randNum = Math.random();
-    this.orientMoveStep = ((randNum > 0.5) ? 0.2 * randNum : -0.2 * randNum);
+    this.orientMoveStep = ((randNum > 0.5) ? 1 * randNum : -1 * randNum);
   }
 
   allowCollision() {
@@ -74,6 +74,7 @@ class Body {
   }
 
   updateOrientation() {
+    console.log(this.id,': ',this.orientMoveStep);
     this.orientation += this.orientMoveStep;
   }
 
@@ -259,11 +260,11 @@ class Body {
 
     const l = i1 * w1 + i2 * w2;
 
-    const a = i2 * i2 / i1 + i2;
-    const b = - 2 * i2 / i1;
+    const a = i2 * i2 + i1 * i2;
+    const b = -2 * i2 * l;
 
-    const q1 = -b / a - w1;
-    const q2 = (l - i1 * w1) / i1;
+    const q2 = -b / a - w2;
+    const q1 = (l - i2 * q2) / i1;
 
     this.orientMoveStep = q1;
     otherBody.orientMoveStep = q2;

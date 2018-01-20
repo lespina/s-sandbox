@@ -33,21 +33,23 @@ class Square extends Body {
 
     this.drawRot(ctx);
 
-    let orientation = new Vector(this.sideSize / 2, this.orientation);
-    for (let i=0; i<4; i++) {
-      ctx.beginPath();
-      ctx.strokeStyle = "#000000";
-      ctx.moveTo(x, y);
-      const [orientX, orientY] = orientation.toArr();
-      ctx.lineTo(x + orientX, y + orientY);
-      ctx.stroke();
-      orientation.rotate(Math.PI / 2);
-    }
+    // let orientation = new Vector(this.sideSize / 2, this.orientation);
+    // for (let i=0; i<4; i++) {
+    //   ctx.beginPath();
+    //   ctx.strokeStyle = "#000000";
+    //   ctx.moveTo(x, y);
+    //   const [orientX, orientY] = orientation.toArr();
+    //   ctx.lineTo(x + orientX, y + orientY);
+    //   ctx.stroke();
+    //   orientation.rotate(Math.PI / 2);
+    // }
   }
 
   drawRot(ctx){
     super.drawRot(ctx, (innerCtx) => {
       innerCtx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize, this.sideSize);
+      // ctx.fillStyle = "#000000";
+      // innerCtx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize / 2, this.sideSize);
     });
   }
 
