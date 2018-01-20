@@ -7,7 +7,7 @@ const SIDESIZE = 30;
 
 class Square extends Body {
   static createRandom(xDim, yDim, x, y, sideSize) {
-    sideSize = 50 || Math.random() * 50 + 10;
+    sideSize = sideSize || Math.random() * 10;
     return Body.createRandom.call(this, xDim, yDim, x, y, sideSize, sideSize);
   }
 
@@ -91,7 +91,7 @@ class Square extends Body {
     return lines;
   }
 
-  reverseOnBounds(xDim, yDim) {
+  reverseOnBounds(xDim, yDim, dampeningFactor) {
     const [x, y] = this.pos.toArr();
 
     const top = 0;
@@ -100,16 +100,35 @@ class Square extends Body {
     const left = 0;
 
     this.asLines().forEach(line => {
+      const lineWidth = line.maxX() - line.minX();
+      const lineHeight = line.maxY() - line.minY();
+      const lineDim = Math.max(lineWidth, lineHeight);
+      const s = this.sideSize / 2;
+      let theta = Math.abs(this.orientation) % (Math.PI / 2);
+      let dist = s * (Math.cos(theta) + Math.sin(theta));
+
       if (line.maxX() > right) {
         this.moveStep.signX(false);
+        this.pos.nums[0] = xDim - dist;
       } else if (line.minX() < left) {
         this.moveStep.signX(true);
+        this.pos.nums[0] = dist;
       } else if (line.maxY() > bottom) {
         this.moveStep.signY(false);
+        this.pos.nums[1] = yDim - dist;
       } else if (line.minY() < top) {
         this.moveStep.signY(true);
+        this.pos.nums[1] = dist;
       }
     });
+
+    this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
+    if (Math.abs(this.moveStep.x()) < 0.1) {
+      this.moveStep.nums[x] = 0;
+    }
+    if (Math.abs(this.moveStep.y()) < 0.1) {
+      this.moveStep.nums[y] = 0;
+    }
   }
 }
 

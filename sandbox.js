@@ -1,9 +1,10 @@
+const shuffle = require('shuffle-array');
 const Circle = require('./circle');
 const Square = require('./square');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.99) {
+  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.98) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
@@ -15,7 +16,7 @@ class SandBox {
     this.attractiveForce = () => new Vector([0, 0]);
     this.inView = {};
     for (let i=0; i<numCircles; i++) {
-      const circle = Square.createRandom(xDim, yDim);
+      const circle = shuffle([Square, Circle])[0].createRandom(xDim, yDim);
       circle.id = i;
       this.inView[circle.id] = circle;
     }
@@ -74,8 +75,8 @@ class SandBox {
   }
 
   update(otherCircles) {
-    const gravity = (this.gravity) ? new Vector([0, 0.1]) : new Vector([0, 0]);
-    
+    const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
+
     for (let circleId in this.inView) {
       const circle = otherCircles[circleId];
       if (!circle.inBounds(this.xDim, this.yDim)) {

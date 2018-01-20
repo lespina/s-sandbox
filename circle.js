@@ -7,7 +7,7 @@ const RADIUS = 30;
 
 class Circle extends Body {
   static createRandom(xDim, yDim, x, y, radius) {
-    radius = radius || Math.random() * 50 + 10;
+    radius = radius || Math.random() * 10;
     return Body.createRandom.call(this, xDim, yDim, x, y, radius, radius);
   }
 
@@ -76,22 +76,12 @@ class Circle extends Body {
   }
 
   intersectsWith(otherBody) {
-    let length;
     if (otherBody.constructor === Circle) {
-      length = otherBody.radius;
-    } else {
-      return super.intersectsWith(otherBody);
+      const dist = (this.pos.subtract(otherBody.pos)).magnitude();
+      return dist < this.radius + otherBody.radius;
     }
-
-
+    return super.intersectsWith(otherBody);
   }
-
-    // let dist = this.pos.subtract(otherCircle.pos).magnitude();
-    // while (dist < this.radius + otherCircle.radius) {
-    //   this.update();
-    //   otherCircle.update();
-    //   dist = this.pos.subtract(otherCircle.pos).magnitude();
-    // }
 
   reverseOnBounds(xDim, yDim, dampeningFactor) {
     const [x, y] = [this.pos.x(), this.pos.y()];

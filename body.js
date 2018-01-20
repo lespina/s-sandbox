@@ -16,14 +16,14 @@ class Body {
     if (x) {
       pos = new Vector([x, y]);
     } else {
-      pos = Vector.random([xDim, yDim]);
+      pos = Vector.random([0.9 * xDim, 0.9 * yDim]);
     }
 
     options = options || { size: 10 };
 
     return new this(
       pos,
-      Vector.random([1, 1], true),
+      Vector.random([10, 10], true),
       randDensity * 10,
       Body.randomColor(),
       options
@@ -61,7 +61,8 @@ class Body {
     this.acceleration = new Vector([0,0]);
 
     this.orientation = 0;
-    this.orientMoveStep = (Math.random() > 0.5) ? 0.1 : -0.1;
+    const randNum = Math.random();
+    this.orientMoveStep = ((randNum > 0.5) ? 0.2 * randNum : -0.2 * randNum);
   }
 
   allowCollision() {
