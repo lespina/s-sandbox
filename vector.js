@@ -149,14 +149,20 @@ class Vector {
     this.nums = this.multiply(new Vector([factor, factor])).nums;
   }
 
-  // dampen(factor) {
-  //   const dampeningArray = [];
-  //   for (let i=0; i<this.nums.length; i++) {
-  //     dampeningArray.push(factor);
-  //   }
-  //   const vector = new Vector(dampeningArray);
-  //   this.multiply(vector);
-  // }
+  sameSignX(otherVector) {
+    return Vector.sameSign(this.x(), otherVector.x());
+  }
+
+  sameSignY(otherVector) {
+    return Vector.sameSign(this.y(), otherVector.y());
+  }
+
+  static sameSign(a, b) {
+    return (
+      a >= 0 && b >= 0 ||
+      a <= 0 && b <= 0
+    );
+  }
 }
 
 module.exports = Vector;

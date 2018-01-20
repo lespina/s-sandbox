@@ -7,7 +7,7 @@ const RADIUS = 30;
 
 class Circle extends Body {
   static createRandom(xDim, yDim, x, y, radius) {
-    radius = radius || Math.random() * 10;
+    radius = radius || (1/2) * (Math.random() * 50 + 10);
     return Body.createRandom.call(this, xDim, yDim, x, y, radius, radius);
   }
 
@@ -24,6 +24,7 @@ class Circle extends Body {
   constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color, radius = RADIUS) {
 
     super(startPos, startVel, mass, color, { radius });
+    this.momentInertia = this.mass / 2 * Math.pow(this.radius, 2);
   }
 
   render(ctx) {
@@ -102,12 +103,14 @@ class Circle extends Body {
     }
 
     this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
+    this.orientMoveStep *= dampeningFactor;
     if (Math.abs(this.moveStep.x()) < 0.1) {
       this.moveStep.nums[x] = 0;
     }
     if (Math.abs(this.moveStep.y()) < 0.1) {
       this.moveStep.nums[y] = 0;
     }
+    this.orientMoveStep = -this.orientMoveStep;
   }
 
 }

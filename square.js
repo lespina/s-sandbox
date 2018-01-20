@@ -7,7 +7,7 @@ const SIDESIZE = 30;
 
 class Square extends Body {
   static createRandom(xDim, yDim, x, y, sideSize) {
-    sideSize = sideSize || Math.random() * 10;
+    sideSize = sideSize || Math.random() * 50 + 10;
     return Body.createRandom.call(this, xDim, yDim, x, y, sideSize, sideSize);
   }
 
@@ -23,6 +23,7 @@ class Square extends Body {
 
   constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color, sideSize = SIDESIZE) {
     super(startPos, startVel, mass, color, { sideSize });
+    this.momentInertia = this.mass * Math.pow(this.sideSize, 2) / 6;
   }
 
   render(ctx) {
@@ -123,12 +124,14 @@ class Square extends Body {
     });
 
     this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
+    this.orientMoveStep *= dampeningFactor;
     if (Math.abs(this.moveStep.x()) < 0.1) {
       this.moveStep.nums[x] = 0;
     }
     if (Math.abs(this.moveStep.y()) < 0.1) {
       this.moveStep.nums[y] = 0;
     }
+    this.orientMoveStep = -this.orientMoveStep;
   }
 }
 

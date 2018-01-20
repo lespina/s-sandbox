@@ -233,17 +233,40 @@ class Body {
       this.moveStep = new Vector([v1fx, v1fy]);
       otherBody.moveStep = new Vector([v2fx, v2fy]);
     } else {
-      if (Math.random() > 0.5 || Math.abs(600 - this.pos.y() < 5)) {
+      if (Math.random() > 0.5) {
+        if (!this.moveStep.sameSignX(otherBody.moveStep)) {
+          otherBody.moveStep.reverseX();
+        }
         this.moveStep.reverseX();
-        otherBody.moveStep.reverseX();
       } else {
+        if (!this.moveStep.sameSignY(otherBody.moveStep)) {
+          otherBody.moveStep.reverseY();
+        }
         this.moveStep.reverseY();
-        otherBody.moveStep.reverseY();
       }
     }
 
     this.cannotCollide = true;
     window.setTimeout(this.allowCollision.bind(this), 150);
+  }
+
+  angularRebound(otherBody) {
+    const i1 = this.momentInertia;
+    const w1 = this.orientMoveStep;
+
+    const i2 = otherBody.momentInertia;
+    const w2 = otherBody.orientMoveStep;
+
+    const l = i1 * w1 + i2 * w2;
+
+    const a = i2 * i2 / i1 + i2;
+    const b = - 2 * i2 / i1;
+
+    const q1 = -b / a - w1;
+    const q2 = (l - i1 * w1) / i1;
+
+    this.orientMoveStep = q1;
+    otherBody.orientMoveStep = q2;
   }
 
   x() {

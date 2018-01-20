@@ -92,9 +92,12 @@ class SandBox {
         if (!circle.cannotCollide && circleId !== otherCircleId && circle.intersectsWith(otherCircle)) {
           delete otherCircles[otherCircle];
           circle.moveStep.dampen(this.dampeningFactor);
+          circle.orientMoveStep *= this.dampeningFactor;
           otherCircle.moveStep.dampen(this.dampeningFactor);
+          otherCircle.orientMoveStep *= this.dampeningFactor;
 
           circle.rebound(otherCircle);
+          circle.angularRebound(otherCircle);
           otherCircle.update(this.attractiveForce.call(otherCircle).add(gravity));
         }
       }
