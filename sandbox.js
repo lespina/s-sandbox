@@ -3,7 +3,7 @@ const Square = require('./square');
 const Vector = require('./vector');
 
 class SandBox {
-  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.99) {
+  constructor(xDim, yDim, numCircles, gravityOn, dampeningFactor = 0.95) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;

@@ -1,6 +1,7 @@
 const Line = require('./line.js');
 const Vector = require('./vector.js');
 const Body = require('./body.js');
+const Square = require('./square.js');
 
 const RADIUS = 30;
 
@@ -64,13 +65,18 @@ class Circle extends Body {
     return lines;
   }
 
-  intersectsWith(otherCircle) {
-    if (otherCircle.constructor === Circle) {
-      const dist = this.pos.subtract(otherCircle.pos).magnitude();
-      return (dist < this.radius + otherCircle.radius);
+  intersectsWith(otherBody) {
+    let length;
+    if (otherBody.constructor === Circle) {
+      length = otherBody.radius;
+    } else if (otherBody.constructor === Square) {
+      length = otherBody.sideSize / 2;
+    } else {
+      return super.intersectsWith(otherBody);
     }
 
-    return super.intersectsWith(otherCircle);
+    const dist = this.pos.subtract(otherBody.pos).magnitude();
+    return (dist < this.radius + length);
   }
 
     // let dist = this.pos.subtract(otherCircle.pos).magnitude();
