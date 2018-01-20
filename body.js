@@ -189,6 +189,35 @@ class Body {
     }
   }
 
+  interchangeMomenta() {
+    const px = this.x() * this.mass;
+    const py = this.y() * this.mass;
+
+    const l = this.orientMoveStep * this.momentInertia;
+
+    const deltaPx = Math.random() * 0.2 * px;
+    const deltaPy = Math.random() * 0.2 * py;
+
+    const deltaL1 = Math.random() * 0.1 * l;
+    const deltaL2 = Math.random() * 0.1 * l;
+
+    this.moveStep.nums[0] -= deltaPx / this.mass;
+    this.moveStep.nums[1] -= deltaPy / this.mass;
+
+    this.orientMoveStep += (deltaPx + deltaPy) / this.momentInertia;
+    this.orientMoveStep -= (deltaL1 + deltaL2) / this.momentInertia;
+
+    this.moveStep.nums[0] += deltaL1 / this.mass;
+    this.moveStep.nums[1] += deltaL2 / this.mass;
+  }
+
+  collide(otherBody) {
+    this.rebound(otherBody);
+    this.angularRebound(otherBody);
+    this.interchangeMomenta();
+    otherBody.interchangeMomenta();
+  }
+
   rebound(otherBody) {
     //CONSTANTS:
     const v10x = this.x();
