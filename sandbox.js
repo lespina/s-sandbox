@@ -75,34 +75,34 @@ class SandBox {
     });
   }
 
-  update(otherCircles) {
+  update(otherBodies) {
     const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
 
-    for (let circleId in this.inView) {
-      const circle = otherCircles[circleId];
-      if (!circle.inBounds(this.xDim, this.yDim)) {
-        circle.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor);
+    for (let bodyId in this.inView) {
+      const body = otherBodies[bodyId];
+      if (!body.inBounds(this.xDim, this.yDim)) {
+        body.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor);
       }
     }
 
-    for (let circleId in otherCircles) {
-      const circle = otherCircles[circleId];
+    for (let bodyId in otherBodies) {
+      const body = otherBodies[bodyId];
 
-      for (let otherCircleId in otherCircles) {
-        const otherCircle = otherCircles[otherCircleId];
-        if (!circle.cannotCollide && circleId !== otherCircleId && circle.intersectsWith(otherCircle)) {
-          delete otherCircles[otherCircle];
-          circle.moveStep.dampen(this.dampeningFactor);
-          circle.orientMoveStep *= this.dampeningFactor;
-          otherCircle.moveStep.dampen(this.dampeningFactor);
-          otherCircle.orientMoveStep *= this.dampeningFactor;
+      for (let otherBodyId in otherBodies) {
+        const otherBody = otherBodies[otherBodyId];
+        if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
+          delete otherBodies[otherBody];
+          body.moveStep.dampen(this.dampeningFactor);
+          body.orientMoveStep *= this.dampeningFactor;
+          otherBody.moveStep.dampen(this.dampeningFactor);
+          otherBody.orientMoveStep *= this.dampeningFactor;
 
-          circle.rebound(otherCircle);
-          circle.angularRebound(otherCircle);
-          otherCircle.update(this.attractiveForce.call(otherCircle).add(gravity));
+          body.rebound(otherBody);
+          body.angularRebound(otherBody);
+          otherBody.update(this.attractiveForce.call(otherBody).add(gravity));
         }
       }
-      circle.update(this.attractiveForce.call(circle).add(gravity));
+      body.update(this.attractiveForce.call(body).add(gravity));
     }
 
 
