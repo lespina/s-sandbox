@@ -79,14 +79,11 @@ class Circle extends Body {
     let length;
     if (otherBody.constructor === Circle) {
       length = otherBody.radius;
-    } else if (otherBody.constructor === Square) {
-      length = otherBody.sideSize / 2;
     } else {
       return super.intersectsWith(otherBody);
     }
 
-    const dist = this.pos.subtract(otherBody.pos).magnitude();
-    return (dist < this.radius + length);
+
   }
 
     // let dist = this.pos.subtract(otherCircle.pos).magnitude();

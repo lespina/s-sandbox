@@ -23,7 +23,7 @@ class Body {
 
     return new this(
       pos,
-      Vector.random([10, 10], true),
+      Vector.random([1, 1], true),
       randDensity * 10,
       Body.randomColor(),
       options
@@ -111,12 +111,22 @@ class Body {
     ctx.fill();
 
     const [dx, dy] = this.moveStep.nums;
+  }
 
-    // ctx.beginPath();
-    // ctx.moveTo(x, y);
-    // ctx.lineTo(x + 10*dx, y + 10*dy);
-    // ctx.strokeStyle = '#FF0000';
-    // ctx.stroke();
+  drawRot(ctx, drawImage){
+    const [x, y] = this.pos.toArr();
+
+    //Set the origin to the center of the image
+    ctx.translate(x, y);
+
+    //Rotate the canvas around the origin
+    ctx.rotate(this.orientation);
+
+    drawImage(ctx);
+
+    //reset the canvas
+    ctx.rotate(-this.orientation);
+    ctx.translate(-x, -y);
   }
 
   inBounds(xDim, yDim) {

@@ -7,7 +7,7 @@ const SIDESIZE = 30;
 
 class Square extends Body {
   static createRandom(xDim, yDim, x, y, sideSize) {
-    sideSize = sideSize || Math.random() * 50 + 10;
+    sideSize = 50 || Math.random() * 50 + 10;
     return Body.createRandom.call(this, xDim, yDim, x, y, sideSize, sideSize);
   }
 
@@ -45,34 +45,9 @@ class Square extends Body {
   }
 
   drawRot(ctx){
-    const [x, y] = this.pos.toArr();
-
-    //Set the origin to the center of the image
-    ctx.translate(x, y);
-
-    //Rotate the canvas around the origin
-    ctx.rotate(this.orientation);
-
-    //draw the image
-    ctx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize, this.sideSize);
-
-    //reset the canvas
-    ctx.rotate(-this.orientation);
-    ctx.translate(-x, -y);
-  }
-
-  intersectsWith(otherBody) {
-    let length;
-    if (otherBody.constructor === Circle) {
-      length = otherBody.radius;
-    } else if (otherBody.constructor === Square) {
-      length = otherBody.sideSize / 2;
-    } else {
-      return super.intersectsWith(otherBody);
-    }
-
-    const dist = this.pos.subtract(otherBody.pos).magnitude();
-    return (dist < this.sideSize / 2 + length);
+    super.drawRot(ctx, (innerCtx) => {
+      innerCtx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize, this.sideSize);
+    });
   }
 
   inBounds(xDim, yDim) {
@@ -89,7 +64,7 @@ class Square extends Body {
       if (
         line.maxX() > right ||
         line.minX() < left ||
-        line.minY() > bottom ||
+        line.maxY() > bottom ||
         line.minY() < top
       ) { answer = false; }
     });
@@ -100,16 +75,17 @@ class Square extends Body {
   asLines() {
     const size = this.sideSize;
     const [x, y] = this.pos.toArr();
+
     const topLeft = [x - size / 2, y - size / 2];
     const topRight = [x + size / 2, y - size / 2];
     const bottomLeft = [x - size / 2, y + size / 2];
     const bottomRight = [x + size / 2, y + size / 2];
 
     const lines = [
-      new Line(topLeft, topRight),
-      new Line(topRight, bottomRight),
-      new Line(bottomRight, bottomLeft),
-      new Line(bottomLeft, topLeft)
+      new Line(topLeft, topRight).rotate({x, y}, this.orientation),
+      new Line(topRight, bottomRight).rotate({x, y}, this.orientation),
+      new Line(bottomRight, bottomLeft).rotate({x, y}, this.orientation),
+      new Line(bottomLeft, topLeft).rotate({x, y}, this.orientation)
     ];
 
     return lines;
@@ -125,16 +101,12 @@ class Square extends Body {
 
     this.asLines().forEach(line => {
       if (line.maxX() > right) {
-        this.pos.nums[0] = xDim - this.sideSize / 2;
         this.moveStep.signX(false);
       } else if (line.minX() < left) {
-        this.pos.nums[0] = this.sideSize / 2;
         this.moveStep.signX(true);
-      } else if (line.minY() > bottom) {
-        this.pos.nums[1] = yDim - this.sideSize / 2;
+      } else if (line.maxY() > bottom) {
         this.moveStep.signY(false);
       } else if (line.minY() < top) {
-        this.pos.nums[1] = this.sideSize / 2;
         this.moveStep.signY(true);
       }
     });

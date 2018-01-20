@@ -74,7 +74,15 @@ class SandBox {
   }
 
   update(otherCircles) {
-    const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
+    const gravity = (this.gravity) ? new Vector([0, 0.1]) : new Vector([0, 0]);
+    
+    for (let circleId in this.inView) {
+      const circle = otherCircles[circleId];
+      if (!circle.inBounds(this.xDim, this.yDim)) {
+        circle.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor);
+      }
+    }
+
     for (let circleId in otherCircles) {
       const circle = otherCircles[circleId];
 
@@ -90,13 +98,6 @@ class SandBox {
         }
       }
       circle.update(this.attractiveForce.call(circle).add(gravity));
-    }
-
-    for (let circleId in this.inView) {
-      const circle = otherCircles[circleId];
-      if (!circle.inBounds(this.xDim, this.yDim)) {
-        circle.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor);
-      }
     }
 
 

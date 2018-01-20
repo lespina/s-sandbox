@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     switch (e.keyCode) {
       case 32:
-        s.add(Square.createRandom(xDim, yDim));
+        s.add(shuffle(bodies)[0].createRandom(xDim, yDim));
         break;
       case 71:
         s.toggleGravity();
