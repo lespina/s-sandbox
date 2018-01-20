@@ -41,6 +41,16 @@ class Circle extends Body {
     );
     ctx.fill();
 
+    let orientation = new Vector(this.radius, this.orientation);
+    for (let i=0; i<4; i++) {
+      ctx.beginPath();
+      ctx.strokeStyle = "#000000";
+      ctx.moveTo(x, y);
+      const [orientX, orientY] = orientation.toArr();
+      ctx.lineTo(x + orientX, y + orientY);
+      ctx.stroke();
+      orientation.rotate(Math.PI / 2);
+    }
   }
 
   asLines(numLines = 8) {

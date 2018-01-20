@@ -32,6 +32,17 @@ class Square extends Body {
 
     ctx.beginPath();
     ctx.fillRect(x - size / 2, y - size / 2, size, size);
+
+    let orientation = new Vector(this.sideSize / 2, this.orientation);
+    for (let i=0; i<4; i++) {
+      ctx.beginPath();
+      ctx.strokeStyle = "#000000";
+      ctx.moveTo(x, y);
+      const [orientX, orientY] = orientation.toArr();
+      ctx.lineTo(x + orientX, y + orientY);
+      ctx.stroke();
+      orientation.rotate(Math.PI / 2);
+    }
   }
 
   intersectsWith(otherBody) {

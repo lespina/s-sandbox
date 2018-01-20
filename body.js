@@ -59,6 +59,7 @@ class Body {
       this[key] = options[key];
     }
     this.acceleration = new Vector([0,0]);
+    this.orientation = 0;
   }
 
   allowCollision() {
