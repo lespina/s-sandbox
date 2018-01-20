@@ -9,17 +9,16 @@ class SandBox {
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
     this.gravity = gravityOn;
-    // if (gravityOn) {
-    //   this.gravity = new Vector([0, 1]);
-    //   window.setInterval(this.rotateGravity.call(this), 5000);
-    // }
+
     this.attractiveForce = () => new Vector([0, 0]);
     this.inView = {};
+
     for (let i=0; i<numBodies; i++) {
       const body = shuffle([Circle, Square])[0].createRandom(xDim, yDim);
       body.id = i;
       this.inView[body.id] = body;
     }
+
     this.nextId = Object.keys(this.inView).length;
   }
 
