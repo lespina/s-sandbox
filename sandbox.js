@@ -1,6 +1,7 @@
 const shuffle = require('shuffle-array');
 const Circle = require('./circle');
 const Square = require('./square');
+const Triangle = require('./triangle');
 const Vector = require('./vector');
 const Grid = require('./grid');
 const _ = require('lodash');
@@ -8,7 +9,7 @@ const _ = require('lodash');
 const GRIDSIZE = 50;
 
 class SandBox {
-  constructor(xDim, yDim, numBodies, gravityOn, dampeningFactor = 0.98) {
+  constructor(xDim, yDim, numBodies, gravityOn, dampeningFactor = 0.99) {
     this.xDim = xDim;
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
@@ -19,7 +20,7 @@ class SandBox {
     this.grid = new Grid(xDim / GRIDSIZE, yDim / GRIDSIZE, GRIDSIZE);
 
     for (let i=0; i<numBodies; i++) {
-      const body = shuffle([Circle, Square])[0].createRandom(xDim, yDim);
+      const body = shuffle([Triangle, Circle, Square])[0].createRandom(xDim, yDim, null, null, 10);
       this.add(body);
     }
   }
@@ -78,7 +79,7 @@ class SandBox {
   }
 
   update() {
-    const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
+    const gravity = (this.gravity) ? new Vector([0, 2]) : new Vector([0, 0]);
     const bodies = this.grid.collection();
 
     for (let bodyId in bodies) {
@@ -95,15 +96,17 @@ class SandBox {
 
       adjSpace.forEach(pos => {
         const otherBodies = this.grid.get(pos);
+
         for (let otherBodyId in otherBodies) {
           const otherBody = otherBodies[otherBodyId];
           if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
             delete bodies[otherBody];
-            body.dampen(this.dampeningFactor);
-            otherBody.dampen(this.dampeningFactor);
-
-            body.rebound(otherBody);
-            body.angularRebound(otherBody);
+            body.collide(otherBody, this.dampeningFactor);
+            // body.dampen(this.dampeningFactor);
+            // otherBody.dampen(this.dampeningFactor);
+            //
+            // body.rebound(otherBody);
+            // body.angularRebound(otherBody);
 
             const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
             otherBody.update(extAcceleration, this.grid);
@@ -117,6 +120,7 @@ class SandBox {
   }
 
   animateCallback(ctx) {
+    console.log('framerate');
     this.update();
     this.render(ctx);
     requestAnimationFrame(this.animateCallback.bind(this, ctx));

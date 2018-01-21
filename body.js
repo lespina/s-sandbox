@@ -1,7 +1,6 @@
-const Line = require('./line.js');
-const Vector = require('./vector.js');
+const Line = require('./line');
+const Vector = require('./vector');
 const _ = require('lodash');
-const Circle = require('./circle.js');
 
 const COLOR = "#FF0000";
 const HEX_DIGITS = "0123456789ABCDEF";
@@ -86,11 +85,10 @@ class Body {
     // this.acceleration = this.acceleration.add(this.jerk);
   }
 
-  update(acceleration, grid) {
+  update(extAcceleration, grid) {
     const start = this.gridPos(grid.gridSize);
-
-    if (acceleration) {
-      this.moveStep = this.moveStep.add(acceleration);
+    if (extAcceleration && this.posArr()[1] >= 1) {
+      this.moveStep = this.moveStep.add(extAcceleration);
     }
 
     this.updatePosition();
@@ -137,21 +135,19 @@ class Body {
   }
 
   inBounds(xDim, yDim) {
-    const [x, y] = this.pos.toArr();
-
-    const top = [x, y + this.radius];
-    const bottom = [x, y - this.radius];
-    const right = [x + this.radius, y];
-    const left = [x - this.radius, y];
+    const top = 0;
+    const bottom = yDim;
+    const right = xDim;
+    const left = 0;
 
     let answer = true;
 
-    [top, bottom, left, right].forEach(pos => {
-      const [x, y] = pos;
-
+    this.asLines().forEach(line => {
       if (
-        x <= 0 || xDim <= x ||
-        y <= 0 || yDim <= y
+        line.maxX() > right ||
+        line.minX() < left ||
+        line.maxY() > bottom ||
+        line.minY() < top
       ) { answer = false; }
     });
 
@@ -197,31 +193,33 @@ class Body {
   interchangeMomenta() {
     const px = this.x() * this.mass;
     const py = this.y() * this.mass;
+    const p = px + py;
 
     const l = this.orientMoveStep * this.momentInertia;
 
-    const deltaPx = Math.random() * 0.2 * px;
-    const deltaPy = Math.random() * 0.2 * py;
+    const deltaP = Math.random() * 0.2 * p;
+    const deltaPx = p / 2;
+    const deltaPy = p / 2;
 
     const deltaL1 = Math.random() * 0.1 * l;
     const deltaL2 = Math.random() * 0.1 * l;
 
-    this.moveStep.nums[0] -= deltaPx / this.mass;
-    this.moveStep.nums[1] -= deltaPy / this.mass;
+    this.moveStep.nums[0] -= (deltaPx / this.mass);
+    this.moveStep.nums[1] -= (deltaPy / this.mass);
 
     this.orientMoveStep += (deltaPx + deltaPy) / this.momentInertia;
     this.orientMoveStep -= (deltaL1 + deltaL2) / this.momentInertia;
 
-    this.moveStep.nums[0] += deltaL1 / this.mass;
-    this.moveStep.nums[1] += deltaL2 / this.mass;
+    this.moveStep.nums[0] += (deltaL1 / this.mass);
+    this.moveStep.nums[1] += (deltaL2 / this.mass);
   }
 
   collide(otherBody, dampeningFactor) {
     this.rebound(otherBody);
     this.angularRebound(otherBody);
 
-    this.interchangeMomenta();
-    otherBody.interchangeMomenta();
+    // this.interchangeMomenta();
+    // otherBody.interchangeMomenta();
 
     this.dampen(dampeningFactor);
     otherBody.dampen(dampeningFactor);

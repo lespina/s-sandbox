@@ -1,80 +1,92 @@
 const Line = require('./line.js');
 const Vector = require('./vector.js');
 const Body = require('./body.js');
-const Circle = require('./circle.js');
 
-const SIDESIZE = 30;
-
-class Square extends Body {
+class Triangle extends Body {
   static createRandom(xDim, yDim, x, y, sideSize) {
-    sideSize = sideSize || Math.random() * 50 + 10;
+    sideSize = sideSize || (Math.random() * 50 + 10);
     return Body.createRandom.call(this, xDim, yDim, x, y, sideSize, sideSize);
   }
 
-  static copy(square) {
-    return new Square(
-      square.pos,
-      square.moveStep,
-      square.mass,
-      square.color,
-      square.sideSize
+  static copy(triangle) {
+    return new Triangle(
+      traingle.pos,
+      traingle.moveStep,
+      traingle.mass,
+      traingle.color,
+      traingle.sideSize
     );
   }
 
-  constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color, sideSize = SIDESIZE) {
+  constructor(startPos = [0, 0], startVel = [0, 0], mass = 1, color, sideSize = 50) {
+
     super(startPos, startVel, mass, color, { sideSize });
-    this.momentInertia = this.mass * Math.pow(this.sideSize, 2) / 6;
+    this.momentInertia = this.mass * Math.pow(this.sideSize, 2) / 18;
+    this.type = "triangle";
   }
 
   render(ctx) {
     this.drawRot(ctx);
   }
 
+  top() {
+    return this.sideSize / Math.sqrt(3);
+  }
+
+  bottomLeft() {
+    const x = -this.top() * Math.sin(240 * Math.PI / 180);
+    const y = this.top() * Math.cos(240 * Math.PI / 180);
+    return [x, y];
+  }
+
+  bottomRight() {
+    const x = -this.top() * Math.sin(120 * Math.PI / 180);
+    const y = this.top() * Math.cos(120 * Math.PI / 180);
+    return [x, y];
+  }
+
   drawRot(ctx){
     super.drawRot(ctx, (innerCtx) => {
       ctx.fillStyle = this.color;
-      innerCtx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize, this.sideSize);
+
+      ctx.beginPath();
+      ctx.moveTo(0, this.top());
+
+      let [x, y] = this.bottomRight();
+
+      ctx.lineTo(x, y);
+
+      [x, y] = this.bottomLeft();
+      ctx.lineTo(x, y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
       ctx.fillStyle = "#000000";
-      innerCtx.fillRect(- this.sideSize / 2, - this.sideSize / 2, this.sideSize / 2, this.sideSize);
+      ctx.moveTo(0, this.top());
+      [x, y] = this.bottomRight();
+      ctx.lineTo(x, y);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      ctx.fill();
     });
   }
 
-  // inBounds(xDim, yDim) {
-  //   const [x, y] = this.pos.toArr();
-  //
-  //   const top = 0;
-  //   const bottom = yDim;
-  //   const right = xDim;
-  //   const left = 0;
-  //
-  //   let answer = true;
-  //
-  //   this.asLines().forEach(line => {
-  //     if (
-  //       line.maxX() > right ||
-  //       line.minX() < left ||
-  //       line.maxY() > bottom ||
-  //       line.minY() < top
-  //     ) { answer = false; }
-  //   });
-  //
-  //   return answer;
-  // }
-
   asLines() {
-    const size = this.sideSize;
     const [x, y] = this.pos.toArr();
 
-    const topLeft = [x - size / 2, y - size / 2];
-    const topRight = [x + size / 2, y - size / 2];
-    const bottomLeft = [x - size / 2, y + size / 2];
-    const bottomRight = [x + size / 2, y + size / 2];
+    const top = [x, y + this.top()];
+
+    const [x0, y0] = this.bottomLeft();
+    const bottomLeft = [x + x0, y + y0];
+
+    const [x1, y1] = this.bottomRight();
+    const bottomRight = [x + x1, y + y1];
 
     const lines = [
-      new Line(topLeft, topRight).rotate({x, y}, this.orientation),
-      new Line(topRight, bottomRight).rotate({x, y}, this.orientation),
+      new Line(top, bottomRight).rotate({x, y}, this.orientation),
       new Line(bottomRight, bottomLeft).rotate({x, y}, this.orientation),
-      new Line(bottomLeft, topLeft).rotate({x, y}, this.orientation)
+      new Line(bottomLeft, top).rotate({x, y}, this.orientation),
     ];
 
     return lines;
@@ -91,10 +103,9 @@ class Square extends Body {
     this.asLines().forEach(line => {
       const lineWidth = line.maxX() - line.minX();
       const lineHeight = line.maxY() - line.minY();
-      const lineDim = Math.max(lineWidth, lineHeight);
-      const s = this.sideSize / 2;
-      let theta = Math.abs(this.orientation) % (Math.PI / 2);
-      let dist = s * (Math.cos(theta) + Math.sin(theta));
+
+      const s = this.sideSize / Math.sqrt(3);
+      const dist = s;
 
       if (line.maxX() > right) {
         this.moveStep.signX(false);
@@ -123,4 +134,4 @@ class Square extends Body {
   }
 }
 
-module.exports = Square;
+module.exports = Triangle;
