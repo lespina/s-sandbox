@@ -12,10 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const bodies = [Circle, Square, Triangle];
 
   const [xDim, yDim] = [750, 400];
-  const s = SandBox.start(xDim, yDim, 100, true);
+  const s = SandBox.start(xDim, yDim, 3, true);
   document.addEventListener('keyup', (e) => {
     e.preventDefault();
     switch (e.keyCode) {
+      case 13:
+        s.add(100);
+        break;
+      case 16:
+        s.add(10);
+        break;
       case 32:
         s.add();
         break;

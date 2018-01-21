@@ -4,6 +4,7 @@ const Square = require('./square');
 const Triangle = require('./triangle');
 const Vector = require('./vector');
 const Grid = require('./grid');
+const Stats = require('stats-js');
 const _ = require('lodash');
 
 const BODIES = [Square, Triangle, Circle];
@@ -17,17 +18,22 @@ class SandBox {
     this.gravity = gravityOn;
     this.nextId = 0;
     this.attractiveForce = () => new Vector([0, 0]);
-
     this.grid = new Grid(xDim / GRIDSIZE, yDim / GRIDSIZE, GRIDSIZE);
-
     this.maxSize = 30 || GRIDSIZE;
-    for (let i=0; i<numBodies; i++) {
-      const body = shuffle(BODIES)[0].createRandom(xDim, yDim, null, null, this.maxSize);
-      this.add(body);
-    }
+    this.add(numBodies);
+    this.initializeStats();
+  }
+
+  initializeStats() {
+    this.stats = new Stats();
+    this.stats.setMode(0);
+    const counter = document.getElementById('counter');
+    document.getElementById('stats-panel').insertBefore(this.stats.domElement, counter);
   }
 
   getRelativePos(e) {
+    //reference: https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
+
     let x, y;
     if (e.pageX || e.pageY) {
       x = e.pageX;
@@ -73,6 +79,8 @@ class SandBox {
   }
 
   clear() {
+    const bodyCount = document.getElementById('body-count');
+    bodyCount.innerHTML = 0;
     this.grid.clear();
   }
 
@@ -95,11 +103,16 @@ class SandBox {
     return sandbox;
   }
 
-  add() {
-    const body = shuffle(BODIES)[0].createRandom(this.xDim, this.yDim, null, null, this.maxSize);
-    body.id = this.nextId++;
-    const pos = body.gridPos(GRIDSIZE);
-    this.grid.add(body, pos);
+  add(n = 1) {
+    const bodyCount = document.getElementById('body-count');
+    const count = bodyCount.innerHTML;
+    bodyCount.innerHTML = parseInt(count) + n;
+    for (let i=0; i<n; i++) {
+      const body = shuffle(BODIES)[0].createRandom(this.xDim, this.yDim, null, null, this.maxSize);
+      body.id = this.nextId++;
+      const pos = body.gridPos(GRIDSIZE);
+      this.grid.add(body, pos);
+    }
   }
 
   render(ctx) {
@@ -159,8 +172,10 @@ class SandBox {
   }
 
   animateCallback(ctx) {
+    this.stats.begin();
     this.update();
     this.render(ctx);
+    this.stats.end();
     requestAnimationFrame(this.animateCallback.bind(this, ctx));
   }
 }

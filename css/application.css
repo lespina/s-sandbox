@@ -8,11 +8,64 @@ body {
   font-size: 48px;
   text-align: center;
   display: block;
-  color: "#ADD8E6";
+}
+
+.simulation {
+  display: flex;
+}
+
+.instructions {
+  margin: 0 35px;
+  display: block;
+  width: 209px;
+  height: 400px;
+  background: url('instructions.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  border: 1px solid black;
+  border-radius: 4px;
 }
 
 #canvas {
   display: block;
-  margin: 0 auto 0 250px;
   border: 1px solid black;
+}
+
+.stats-container {
+  margin: auto;
+}
+
+#stats-panel {
+  padding: 20px 15px 0px 20px;
+  border: 1px solid black;
+  margin: auto;
+  background-color: DeepSkyBlue;
+}
+
+.counter-title {
+  padding-top: 2px;
+}
+
+.stats-title {
+  font-family: 'Pacifico', cursive;
+  text-align: center;
+  background: white;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+  padding-top: 5px;
+  border-top: 2px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+#counter {
+  font-family: 'Pacifico', cursive;
+  background-color: white;
+  border: 1px solid black;
+  display: block;
+  width: 80px;
+  height: 40px;
+  margin: 20px 0;
+  text-align: center;
+  line-height: 1;
 }
