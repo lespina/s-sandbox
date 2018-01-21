@@ -100,36 +100,15 @@ class Body {
     grid.move(this.id, start, end);
   }
 
-  render(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-
+  drawRot(ctx, draw){
     const [x, y] = this.pos.toArr();
 
-    ctx.arc(
-      x,
-      y,
-      20,
-      0,
-      2 * Math.PI
-    );
-    ctx.fill();
-
-    const [dx, dy] = this.moveStep.nums;
-  }
-
-  drawRot(ctx, drawImage){
-    const [x, y] = this.pos.toArr();
-
-    //Set the origin to the center of the image
     ctx.translate(x, y);
 
-    //Rotate the canvas around the origin
     ctx.rotate(this.orientation);
 
-    drawImage(ctx);
+    draw(ctx);
 
-    //reset the canvas
     ctx.rotate(-this.orientation);
     ctx.translate(-x, -y);
   }
@@ -174,8 +153,7 @@ class Body {
 
   chooseV1fx(otherBody) {
     const randNum = Math.random();
-    const newVel = Math.abs((this.x() + this.y()) * randNum);
-    // const newVel = Math.abs(randNum > 0.5) ? (this.x() * randNum : this.x() * (1 + randNum);
+    const newVel = Math.abs((this.moveStep.magnitude()) * randNum);
 
     const thisMomentum = this.mass * this.x();
     const otherMomentum = otherBody.mass * otherBody.x();
@@ -197,7 +175,7 @@ class Body {
 
     const l = this.orientMoveStep * this.momentInertia;
 
-    const deltaP = Math.random() * 0.2 * p;
+    const deltaP = Math.random() * 0.1 * p;
     const deltaPx = p / 2;
     const deltaPy = p / 2;
 
@@ -321,14 +299,6 @@ class Body {
   gridPos(gridSize) {
     const [x, y] = this.posArr();
     return [Math.floor(x / gridSize), Math.floor(y / gridSize)];
-  }
-
-  momentumX() {
-    return Math.abs(this.moveStep.x() * this.mass);
-  }
-
-  momentumY() {
-    return Math.abs(this.moveStep.y() * this.mass);
   }
 
   reverse() {

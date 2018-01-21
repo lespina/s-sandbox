@@ -36,6 +36,12 @@ class Grid {
     return this;
   }
 
+  clear() {
+    const [width, height] = this.dimensions;
+    this.grid = Grid.createGrid(width, height);
+    this.bucket = {};
+  }
+
   move(id, start, end) {
     const [i, j] = this.inRange(start);
     const item = this.grid[i][j][id];

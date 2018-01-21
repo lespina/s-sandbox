@@ -4,7 +4,8 @@ const Body = require('./body.js');
 
 class Triangle extends Body {
   static createRandom(xDim, yDim, x, y, sideSize) {
-    sideSize = sideSize || (Math.random() * 50 + 10);
+    sideSize = sideSize || 50;
+    sideSize = Math.random() * (0.9 * sideSize) + 0.1 * sideSize;
     return Body.createRandom.call(this, xDim, yDim, x, y, sideSize, sideSize);
   }
 

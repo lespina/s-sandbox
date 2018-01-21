@@ -7,7 +7,8 @@ const RADIUS = 30;
 
 class Circle extends Body {
   static createRandom(xDim, yDim, x, y, radius) {
-    radius = (1/2) * radius || (1/2) * (Math.random() * 50 + 10);
+    radius = radius || 50;
+    radius = (1/2) * (Math.random() * (0.9 * radius) + 0.1 * radius);
     return Body.createRandom.call(this, xDim, yDim, x, y, radius, radius);
   }
 

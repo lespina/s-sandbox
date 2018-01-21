@@ -12,12 +12,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const bodies = [Circle, Square, Triangle];
 
   const [xDim, yDim] = [1000, 600];
-  const s = SandBox.start(xDim, yDim, 250, true);
+  const s = SandBox.start(xDim, yDim, 100, true);
   document.addEventListener('keyup', (e) => {
     e.preventDefault();
     switch (e.keyCode) {
       case 32:
-        s.add(shuffle(bodies)[0].createRandom(xDim, yDim));
+        s.add();
+        break;
+      case 67:
+        s.clear();
+        break;
+      case 70:
+        s.removeForces();
+        s.freeze();
         break;
       case 71:
         s.toggleGravity();

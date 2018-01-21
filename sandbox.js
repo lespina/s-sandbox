@@ -6,6 +6,7 @@ const Vector = require('./vector');
 const Grid = require('./grid');
 const _ = require('lodash');
 
+const BODIES = [Square, Triangle, Circle];
 const GRIDSIZE = 50;
 
 class SandBox {
@@ -19,8 +20,9 @@ class SandBox {
 
     this.grid = new Grid(xDim / GRIDSIZE, yDim / GRIDSIZE, GRIDSIZE);
 
+    this.maxSize = 10 || GRIDSIZE;
     for (let i=0; i<numBodies; i++) {
-      const body = shuffle([Triangle, Circle, Square])[0].createRandom(xDim, yDim, null, null, 10);
+      const body = shuffle(BODIES)[0].createRandom(xDim, yDim, null, null, this.maxSize);
       this.add(body);
     }
   }
@@ -30,7 +32,7 @@ class SandBox {
     this.attractiveForce = function() {
       const attractiveForce = mousePos.subtract(this.pos);
       const mag = attractiveForce.magnitude();
-      attractiveForce.dampen(1/mag);
+      attractiveForce.dampen(1 / mag);
       return attractiveForce;
     };
   }
@@ -42,6 +44,19 @@ class SandBox {
   removeForces() {
     this.gravity = false;
     this.attractiveForce = () => new Vector([0, 0]);
+  }
+
+  freeze() {
+    const bodies = this.grid.collection();
+
+    for (let bodyId in bodies) {
+      const body = bodies[bodyId];
+      body.moveStep = new Vector([0, 0]);
+    }
+  }
+
+  clear() {
+    this.grid.clear();
   }
 
   rotateGravity() {
@@ -63,7 +78,8 @@ class SandBox {
     return sandbox;
   }
 
-  add(body) {
+  add() {
+    const body = shuffle(BODIES)[0].createRandom(this.xDim, this.yDim, null, null, this.maxSize);
     body.id = this.nextId++;
     const pos = body.gridPos(GRIDSIZE);
     this.grid.add(body, pos);
@@ -71,7 +87,11 @@ class SandBox {
 
   render(ctx) {
     ctx.clearRect(0, 0, this.xDim, this.yDim);
-    ctx.fillStyle = '#ADD8E6';
+    const grad = ctx.createLinearGradient(0, 0, 0, this.yDim);
+    grad.addColorStop(0, 'white');
+    grad.addColorStop(1, '#ADD8E6');
+    ctx.fillStyle = grad;//'#ADD8E6';
+
     ctx.fillRect(0, 0, this.xDim, this.yDim);
     _.values(this.grid.collection()).forEach(circle => {
       circle.render(ctx);
@@ -79,7 +99,7 @@ class SandBox {
   }
 
   update() {
-    const gravity = (this.gravity) ? new Vector([0, 2]) : new Vector([0, 0]);
+    const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
     const bodies = this.grid.collection();
 
     for (let bodyId in bodies) {
@@ -94,7 +114,9 @@ class SandBox {
       const gridPos = body.gridPos(this.grid.gridSize);
       const adjSpace = this.grid.adjacentPositions(gridPos);
 
-      adjSpace.forEach(pos => {
+      for (let i=0; i<adjSpace.length; i++) {
+        let collided = false;
+        const pos = adjSpace[i];
         const otherBodies = this.grid.get(pos);
 
         for (let otherBodyId in otherBodies) {
@@ -102,17 +124,17 @@ class SandBox {
           if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
             delete bodies[otherBody];
             body.collide(otherBody, this.dampeningFactor);
-            // body.dampen(this.dampeningFactor);
-            // otherBody.dampen(this.dampeningFactor);
-            //
-            // body.rebound(otherBody);
-            // body.angularRebound(otherBody);
 
             const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
             otherBody.update(extAcceleration, this.grid);
+
+            collided = true;
+            break;
           }
         }
-      }, this);
+
+        if (collided) { break; }
+      }
 
       const extAcceleration = this.attractiveForce.call(body).add(gravity);
       body.update(extAcceleration, this.grid);
@@ -120,7 +142,6 @@ class SandBox {
   }
 
   animateCallback(ctx) {
-    console.log('framerate');
     this.update();
     this.render(ctx);
     requestAnimationFrame(this.animateCallback.bind(this, ctx));

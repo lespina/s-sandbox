@@ -139,10 +139,11 @@ class Vector {
 
   rotate(angle = Math.PI / 2) {
     const [x, y] = this.nums;
-    this.nums = [
+    const nums = [
       x * Math.cos(angle) + y * Math.sin(angle),
       -x * Math.sin(angle) + y * Math.cos(angle)
     ];
+    return new Vector(nums);
   }
 
   dampen(factor) {
