@@ -20,15 +20,32 @@ class SandBox {
 
     this.grid = new Grid(xDim / GRIDSIZE, yDim / GRIDSIZE, GRIDSIZE);
 
-    this.maxSize = 10 || GRIDSIZE;
+    this.maxSize = 30 || GRIDSIZE;
     for (let i=0; i<numBodies; i++) {
       const body = shuffle(BODIES)[0].createRandom(xDim, yDim, null, null, this.maxSize);
       this.add(body);
     }
   }
 
+  getRelativePos(e) {
+    let x, y;
+    if (e.pageX || e.pageY) {
+      x = e.pageX;
+      y = e.pageY;
+    } else {
+      x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+      y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    }
+    const canvas = document.getElementById('canvas');
+    x -= canvas.offsetLeft;
+    y -= canvas.offsetTop;
+    return [x, y];
+  }
+
   setAttractor(e) {
-    const mousePos = new Vector([e.x, e.y]);
+    const [x, y] = this.getRelativePos(e);
+
+    const mousePos = new Vector([x, y]);
     this.attractiveForce = function() {
       const attractiveForce = mousePos.subtract(this.pos);
       const mag = attractiveForce.magnitude();

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const bodies = [Circle, Square, Triangle];
 
-  const [xDim, yDim] = [1000, 600];
+  const [xDim, yDim] = [750, 400];
   const s = SandBox.start(xDim, yDim, 100, true);
   document.addEventListener('keyup', (e) => {
     e.preventDefault();
@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
     }
   });
-  document.addEventListener('click', s.setAttractor.bind(s));
+  const canvas = document.getElementById('canvas');
+  canvas.addEventListener('click', s.setAttractor.bind(s));
   // window.setInterval(SandBox.start.bind(SandBox, 1000, 1000), 2500);
 });
