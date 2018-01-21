@@ -12,12 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const bodies = [Circle, Square];
 
   const [xDim, yDim] = [1000, 600];
-  const s = SandBox.start(xDim, yDim, 3, true);
+  const s = SandBox.start(xDim, yDim, 1, true);
   document.addEventListener('keyup', (e) => {
     e.preventDefault();
     switch (e.keyCode) {
       case 32:
-        s.add(shuffle([Square, Circle])[0].createRandom(xDim, yDim));
+        s.add(shuffle(bodies)[0].createRandom(xDim, yDim));
         break;
       case 71:
         s.toggleGravity();

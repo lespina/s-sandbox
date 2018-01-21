@@ -74,7 +74,6 @@ class Body {
   }
 
   updateOrientation() {
-    console.log(this.id,': ',this.orientMoveStep);
     this.orientation += this.orientMoveStep;
   }
 
@@ -87,7 +86,9 @@ class Body {
     // this.acceleration = this.acceleration.add(this.jerk);
   }
 
-  update(acceleration) {
+  update(acceleration, grid) {
+    const start = this.gridPos(grid.gridSize);
+
     if (acceleration) {
       this.moveStep = this.moveStep.add(acceleration);
     }
@@ -95,6 +96,10 @@ class Body {
     this.updatePosition();
     this.updateOrientation();
     this.updateVelocity();
+
+    const end = this.gridPos(grid.gridSize);
+
+    grid.move(this.id, start, end);
   }
 
   render(ctx) {
@@ -211,11 +216,15 @@ class Body {
     this.moveStep.nums[1] += deltaL2 / this.mass;
   }
 
-  collide(otherBody) {
+  collide(otherBody, dampeningFactor) {
     this.rebound(otherBody);
     this.angularRebound(otherBody);
+
     this.interchangeMomenta();
     otherBody.interchangeMomenta();
+
+    this.dampen(dampeningFactor);
+    otherBody.dampen(dampeningFactor);
   }
 
   rebound(otherBody) {
@@ -307,6 +316,15 @@ class Body {
     return this.moveStep.y();
   }
 
+  posArr() {
+    return this.pos.toArr();
+  }
+
+  gridPos(gridSize) {
+    const [x, y] = this.posArr();
+    return [Math.floor(x / gridSize), Math.floor(y / gridSize)];
+  }
+
   momentumX() {
     return Math.abs(this.moveStep.x() * this.mass);
   }
@@ -327,7 +345,7 @@ class Body {
     this.moveStep.rotate(angle);
   }
 
-  reverseOnBounds(xDim, yDim, dampeningFactor) {
+  reverseOnBounds(xDim, yDim, dampeningFactor, grid) {
     const top = new Line([0, 0], [xDim, 0]);
     top.side = 'TOP';
     const bottom = new Line([0, yDim], [xDim, yDim]);
@@ -341,6 +359,8 @@ class Body {
     const intersectedLine = this.intersectsWith(boundsBody);
 
     if (intersectedLine) {
+      const start = this.gridPos(grid.gridSize);
+
       switch (intersectedLine.side) {
         case 'TOP':
           this.pos.nums[1] = 0;
@@ -361,6 +381,9 @@ class Body {
         default:
           alert('bounds error');
       }
+
+      const end = this.gridPos(grid.gridSize);
+      grid.move(this.id, start, end);
     }
 
     this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
@@ -372,34 +395,10 @@ class Body {
     }
   }
 
-  // reverseOnBounds(xDim, yDim, dampeningFactor) {
-  //   const [x, y] = [this.pos.x(), this.pos.y()];
-  //
-  //   if (x <= 0) {
-  //     this.pos.nums[0] = 0;
-  //     this.moveStep.reverseX();
-  //   } else if (xDim <= x) {
-  //     this.pos.nums[0] = xDim;
-  //     this.moveStep.reverseX();
-  //   }
-  //
-  //   if (y <= 0) {
-  //     this.pos.nums[1] = 0;
-  //     this.moveStep.reverseY();
-  //   } else if (yDim <= y) {
-  //     this.pos.nums[1] = yDim;
-  //     this.moveStep.reverseY();
-  //   }
-  //
-  //   this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
-  //   if (Math.abs(this.moveStep.x()) < 0.1) {
-  //     this.moveStep.nums[x] = 0;
-  //   }
-  //   if (Math.abs(this.moveStep.y()) < 0.1) {
-  //     this.moveStep.nums[y] = 0;
-  //   }
-  // }
-
+  dampen(factor) {
+    this.moveStep.dampen(factor);
+    this.orientMoveStep *= factor;
+  }
 }
 
 module.exports = Body;

@@ -2,6 +2,10 @@ const shuffle = require('shuffle-array');
 const Circle = require('./circle');
 const Square = require('./square');
 const Vector = require('./vector');
+const Grid = require('./grid');
+const _ = require('lodash');
+
+const GRIDSIZE = 50;
 
 class SandBox {
   constructor(xDim, yDim, numBodies, gravityOn, dampeningFactor = 0.98) {
@@ -9,17 +13,15 @@ class SandBox {
     this.yDim = yDim;
     this.dampeningFactor = dampeningFactor;
     this.gravity = gravityOn;
-
+    this.nextId = 0;
     this.attractiveForce = () => new Vector([0, 0]);
-    this.inView = {};
+
+    this.grid = new Grid(xDim / GRIDSIZE, yDim / GRIDSIZE, GRIDSIZE);
 
     for (let i=0; i<numBodies; i++) {
       const body = shuffle([Circle, Square])[0].createRandom(xDim, yDim);
-      body.id = i;
-      this.inView[body.id] = body;
+      this.add(body);
     }
-
-    this.nextId = Object.keys(this.inView).length;
   }
 
   setAttractor(e) {
@@ -61,81 +63,56 @@ class SandBox {
   }
 
   add(body) {
-    body.id = this.nextId;
-    this.inView[this.nextId++] = body;
+    body.id = this.nextId++;
+    const pos = body.gridPos(GRIDSIZE);
+    this.grid.add(body, pos);
   }
 
   render(ctx) {
     ctx.clearRect(0, 0, this.xDim, this.yDim);
     ctx.fillStyle = '#ADD8E6';
     ctx.fillRect(0, 0, this.xDim, this.yDim);
-    Object.values(this.inView).forEach(circle => {
+    _.values(this.grid.collection()).forEach(circle => {
       circle.render(ctx);
     });
   }
 
-  update(otherBodies) {
+  update() {
     const gravity = (this.gravity) ? new Vector([0, 1]) : new Vector([0, 0]);
+    const bodies = this.grid.collection();
 
-    for (let bodyId in this.inView) {
-      const body = otherBodies[bodyId];
+    for (let bodyId in bodies) {
+      const body = bodies[bodyId];
       if (!body.inBounds(this.xDim, this.yDim)) {
-        body.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor);
+        body.reverseOnBounds(this.xDim, this.yDim, this.dampeningFactor, this.grid);
       }
     }
 
-    for (let bodyId in otherBodies) {
-      const body = otherBodies[bodyId];
+    for (let bodyId in bodies) {
+      const body = bodies[bodyId];
 
-      for (let otherBodyId in otherBodies) {
-        const otherBody = otherBodies[otherBodyId];
+      for (let otherBodyId in bodies) {
+        const otherBody = bodies[otherBodyId];
         if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
-          delete otherBodies[otherBody];
-          body.moveStep.dampen(this.dampeningFactor);
-          body.orientMoveStep *= this.dampeningFactor;
-          otherBody.moveStep.dampen(this.dampeningFactor);
-          otherBody.orientMoveStep *= this.dampeningFactor;
+          delete bodies[otherBody];
+          body.dampen(this.dampeningFactor);
+          otherBody.dampen(this.dampeningFactor);
 
           body.rebound(otherBody);
           body.angularRebound(otherBody);
-          otherBody.update(this.attractiveForce.call(otherBody).add(gravity));
+
+          const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
+          otherBody.update(extAcceleration, this.grid);
         }
       }
-      body.update(this.attractiveForce.call(body).add(gravity));
+
+      const extAcceleration = this.attractiveForce.call(body).add(gravity);
+      body.update(extAcceleration, this.grid);
     }
-
-
-    // this.inView.forEach((circle, i) => {
-    //   let newCircle;
-    //   otherCircles.forEach((otherCircle, j) => {
-    //     if (!circle.cannotCollide && i !== j && circle.intersectsWith(otherCircle)) {
-    //       newCircle = Circle.copy(circle);
-    //       // newCircle.moveStep = newCircle.moveStep.multiply(new Vector([this.dampeningFactor, this.dampeningFactor]));
-    //       newCircle.rebound(otherCircle);
-    //     }
-    //   }, this);
-    //
-    //   let chosenCircle;
-    //   if (newCircle) {
-    //     chosenCircle = newCircle;
-    //   } else {
-    //     chosenCircle = circle;
-    //   }
-    //
-    //   chosenCircle.update();
-    //   if (chosenCircle.inBounds(this.xDim, this.yDim)) {
-    //     newView.push(chosenCircle);
-    //   } else {
-    //     chosenCircle.reverse();
-    //     newView.push(chosenCircle);
-    //   }
-    // }, this);
-    //
-    // this.inView = newView;
   }
 
   animateCallback(ctx) {
-    this.update(Object.assign(this.inView));
+    this.update();
     this.render(ctx);
     requestAnimationFrame(this.animateCallback.bind(this, ctx));
   }
