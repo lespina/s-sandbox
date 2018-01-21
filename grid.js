@@ -17,6 +17,11 @@ class Grid {
     this.bucket = {};
   }
 
+  get(pos) {
+    const [x, y] = pos;
+    return this.grid[x][y];
+  }
+
   add(item, pos) {
     let [i, j] = this.inRange(pos);
     this.grid[i][j][item.id] = item;
@@ -69,6 +74,22 @@ class Grid {
     if (n < 0) { return 0; }
     if (n > height - 1) { return height - 1; }
     return n;
+  }
+
+  adjacentPositions(pos) {
+    const [x, y] = pos;
+    const [width, height] = this.dimensions;
+
+    const result = [];
+    for (let i = x-1; i <= x+1; i++) {
+      if (i < 0 || i > width - 1) { continue; }
+      for (let j = y-1; j <= y+1; j++) {
+        if (j < 0 || j > height - 1) { continue; }
+        result.push([i, j]);
+      }
+    }
+
+    return result;
   }
 }
 

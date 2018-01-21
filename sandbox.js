@@ -90,21 +90,26 @@ class SandBox {
 
     for (let bodyId in bodies) {
       const body = bodies[bodyId];
+      const gridPos = body.gridPos(this.grid.gridSize);
+      const adjSpace = this.grid.adjacentPositions(gridPos);
 
-      for (let otherBodyId in bodies) {
-        const otherBody = bodies[otherBodyId];
-        if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
-          delete bodies[otherBody];
-          body.dampen(this.dampeningFactor);
-          otherBody.dampen(this.dampeningFactor);
+      adjSpace.forEach(pos => {
+        const otherBodies = this.grid.get(pos);
+        for (let otherBodyId in otherBodies) {
+          const otherBody = otherBodies[otherBodyId];
+          if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
+            delete bodies[otherBody];
+            body.dampen(this.dampeningFactor);
+            otherBody.dampen(this.dampeningFactor);
 
-          body.rebound(otherBody);
-          body.angularRebound(otherBody);
+            body.rebound(otherBody);
+            body.angularRebound(otherBody);
 
-          const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
-          otherBody.update(extAcceleration, this.grid);
+            const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
+            otherBody.update(extAcceleration, this.grid);
+          }
         }
-      }
+      }, this);
 
       const extAcceleration = this.attractiveForce.call(body).add(gravity);
       body.update(extAcceleration, this.grid);
