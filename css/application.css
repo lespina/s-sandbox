@@ -22,7 +22,7 @@ body {
 
 .instructions {
   flex-shrink: 0;
-  margin: 0 35px;
+  margin: 0 auto;
   display: block;
   width: 209px;
   height: 400px;
@@ -127,4 +127,123 @@ body {
   position: absolute;
   left: -57px;
   bottom: -20px;
+}
+
+@media (max-width: 1160px) {
+  #canvas, .instructions {
+    transform: scale(0.80);
+    margin: 0 -30px 0 0;
+  }
+  .instructions {
+    margin-left: 40px;
+  }
+  #canvas {
+    margin-left: -50px;
+    margin-right: -50px;
+  }
+}
+
+@media (min-width: 1240px) {
+  #canvas, .instructions {
+    transform: scale(1.10);
+    margin: 0 35px 35px 35px;
+  }
+}
+
+@media (min-width: 1460px) {
+  #canvas, .instructions {
+    transform: scale(1.25);
+    margin: 60px 80px;
+  }
+}
+
+@media (min-width: 1620px) {
+  #canvas, .instructions {
+    transform: scale(1.40);
+    margin: 75px 145px 75px 100px;
+  }
+  .background {
+    position: relative;
+  }
+  .links {
+    position: absolute;
+    width: 100%;
+    top: -10px;
+    left: 6%;
+  }
+  .linkedin {
+    position: absolute;
+    left: 22%;
+  }
+  .github {
+    position: absolute;
+    right: 16%;
+  }
+  .angellist {
+    position: absolute;
+    right: 35%;
+  }
+}
+
+@media (max-height: 630px) {
+  .background {
+    position: relative;
+  }
+  .links {
+    position: absolute;
+    width: 100%;
+    top: -10px;
+    left: 6%;
+  }
+  .linkedin {
+    position: absolute;
+    left: 22%;
+  }
+  .github {
+    position: absolute;
+    right: 16%;
+  }
+  .angellist {
+    position: absolute;
+    right: 35%;
+  }
+}
+
+@media (min-width: 1820px) {
+  #canvas, .instructions {
+    transform: scale(1.6);
+    margin: 120px 200px 100px 125px;
+  }
+}
+
+@media (min-width: 1980px) {
+  #canvas, .instructions {
+    transform: scale(1.75);
+    margin: 145px 240px 145px 160px;
+  }
+  #canvas {
+    margin-right: 270px;
+  }
+}
+
+@media (max-width: 1020px) and (max-height: 630px) {
+  .personal-site, .github, .linkedin, .angellist {
+    position:sticky;
+    margin-left: -50px;
+  }
+
+  .github:before, .linkedin:before, .angellist:before, .personal-site:before {
+    margin-left: 20px;
+    margin-bottom: 4px;
+    background-size: 15px 15px;
+  }
+
+  .links {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .title {
+    margin-left: 100px;
+  }
 }
