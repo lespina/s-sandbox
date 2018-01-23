@@ -18,7 +18,7 @@ Sublime implements a smart grid-based collision-detection algorithm for fast per
 
 When lots of shapes come out to play, things get pretty wild.
 
-##### A Brief Detour: Collision Checking
+#### A Brief Detour: Collision Checking
 
 In order to check if two objects need to collide in a given animation frame, Sublime implements a few key methods:
 
@@ -61,7 +61,7 @@ class Body {
     for (let i=0; i<thisLines.length; i++) {
       for (let j=0; j<otherLines.length; j++) {
         if (thisLines[i].intersectsWith(otherLines[j])) {
-          return otherLines[j];
+          return true;
         }
       }
     }
@@ -76,7 +76,7 @@ class Body {
 
 In the initial naive implementation of collision detection, we simply checked every body against every other body on the map.  This resulted in a rather slow, limited final product that began to slow noticeably at just 50 on-screen bodies.  Following deep contemplation, we realized the errors of our ways, and rewrote the collision-checking algorithm to utilize an internal grid to avoid checking collisions between objects far apart on the canvas.
 
-##### Finally, the grid-based scheme!
+#### Finally, the grid-based detection scheme!
 
 Upon initialization, Sublime creates a 2-dimensional grid object, where each grid space occupies a square whose side-length is equal to the maximum possible length of any generated body on the canvas.
 
