@@ -157,25 +157,17 @@ class SandBox {
       const adjSpace = this.grid.adjacentPositions(gridPos);
 
       for (let i=0; i<adjSpace.length; i++) {
-        // let collided = false;
         const pos = adjSpace[i];
         const otherBodies = this.grid.get(pos);
 
         for (let otherBodyId in otherBodies) {
           const otherBody = otherBodies[otherBodyId];
           if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
-            // delete bodies[otherBody];
             body.collide(otherBody, this.dampeningFactor);
-
             const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
             otherBody.update(extAcceleration, this.grid);
-
-            // collided = true;
-            // break;
           }
         }
-
-        // if (collided) { break; }
       }
 
       const extAcceleration = this.attractiveForce.call(body).add(gravity);

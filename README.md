@@ -74,17 +74,43 @@ class Body {
 
 ##### Aside: A word on the naive approach (not used)
 
-In the initial naive implementation of collision detection, we simply checked every body against every other body on the map.  This resulted in a rather slow, limited final product that began to slow noticeably at just 50 on-screen bodies.  Following deep contemplation, we realized the errors of our ways, and rewrote the collision-checking algorithm to utilize an internal grid avoid checking collisions between objects far apart on the canvas.
+In the initial naive implementation of collision detection, we simply checked every body against every other body on the map.  This resulted in a rather slow, limited final product that began to slow noticeably at just 50 on-screen bodies.  Following deep contemplation, we realized the errors of our ways, and rewrote the collision-checking algorithm to utilize an internal grid to avoid checking collisions between objects far apart on the canvas.
 
 ##### Finally, the grid-based scheme!
 
 Upon initialization, Sublime creates a 2-dimensional grid object, where each grid space occupies a square whose side-length is equal to the maximum possible length of any generated body on the canvas.
 
-Internally, the Sublime.js keeps all constituent bodies stored this object, grouping together bodies by the grid space that bounds their center position on the canvas.
+Internally, the Sublime.js keeps all constituent bodies stored in this object, grouping together bodies by the grid space that bounds their center position on the canvas.
 
 ![Grid](css/grid.png)
 
-With our handy grid, we now iterate over all bodies at each frame and check if each body intersects only with those objects that fall within a 1-grid-space radius of its own grid position!  Since we defined the size of grid spaces as equal to the maximum possible length of a body on the canvas, no body may possibly collide with another body that is more than 1 space apart from itself on the grid.
+With our handy grid, we now iterate over all bodies at each frame and check if each body intersects only with those objects that fall within a 1-grid-space radius of its own grid position!  
+
+```javascript
+  ...
+  const bodies = grid.collection();
+  for (let bodyId in bodies) {
+    const body = bodies[bodyId];
+    const adjSpaces = grid.adjSpaces(body.gridPos);
+
+    for (let i=0; i<adjSpaces.length; i++) {
+      const pos = adjSpaces[i];
+      const otherBodies = grid.get(pos);
+
+      for (let otherBodyId in otherBodies) {
+        const otherBody = otherBodies[otherBodyId];
+        if (bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
+          body.collide(otherBody);
+        ...
+        }
+      }
+    }
+    ...
+  }
+  ...
+```
+
+Since we defined the size of grid spaces as equal to the maximum possible length of a body on the canvas, no body may possibly collide with another body that is more than 1 space apart from itself on the grid.
 
 Following the implementation of this algorithm, we were suddenly able to maintain performance while rendering hundreds of objects and interactions on-screen.
 
