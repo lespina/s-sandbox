@@ -70,7 +70,7 @@ class Body {
   ...
 }
 ```
-<sup>N.B. line-intersection package is used to check of a line intersects with another line</sup>
+<sup>N.B. line-intersection package is used to check if a line intersects with another line</sup>
 
 ##### Aside: A word on the naive approach (not used)
 
