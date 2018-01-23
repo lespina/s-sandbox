@@ -4,6 +4,7 @@ const Square = require('./square');
 const Triangle = require('./triangle');
 const Vector = require('./vector');
 const Grid = require('./grid');
+const Util = require('./util');
 const Stats = require('stats-js');
 const _ = require('lodash');
 
@@ -43,9 +44,20 @@ class SandBox {
       y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     }
     const canvas = document.getElementById('canvas');
-    x -= canvas.offsetLeft;
-    y -= canvas.offsetTop;
-    return [x, y];
+    //1980+ x = 240, y = 85
+    //1820+ x = 140, y = 48
+    //1620+ x = 93, y = 48
+
+    //1240+ x = 35, y = 18
+    //120+ x = 0, y = 0
+    //else x = -76, y = -41
+    const width = Util.getWidth();
+    const [offsetX, offsetY] = Util.getMarginOffsets(width);
+    const scale = Util.getScale(width);
+    x -= (canvas.offsetLeft - offsetX);
+    y -= (canvas.offsetTop - offsetY);
+    debugger
+    return [x / scale, y / scale];
   }
 
   setAttractor(e) {

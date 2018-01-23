@@ -6,6 +6,8 @@ a {
 body {
   background: url('bg.png');
   background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
   font-family: 'Pacifico', cursive;
 }
 
