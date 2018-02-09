@@ -87,7 +87,7 @@ class Body {
 
   update(extAcceleration, grid) {
     const start = this.gridPos(grid.gridSize);
-    if (extAcceleration && this.posArr()[1] >= 1) {
+    if (extAcceleration) {
       this.moveStep = this.moveStep.add(extAcceleration);
     }
 

@@ -11,11 +11,11 @@ class Triangle extends Body {
 
   static copy(triangle) {
     return new Triangle(
-      traingle.pos,
-      traingle.moveStep,
-      traingle.mass,
-      traingle.color,
-      traingle.sideSize
+      triangle.pos,
+      triangle.moveStep,
+      triangle.mass,
+      triangle.color,
+      triangle.sideSize
     );
   }
 
@@ -110,29 +110,53 @@ class Triangle extends Body {
 
       if (line.maxX() > right) {
         this.moveStep.signX(false);
-        this.pos.nums[0] = xDim - dist;
+        // this.pos.nums[0] = xDim - dist;
       } else if (line.minX() < left) {
         this.moveStep.signX(true);
-        this.pos.nums[0] = dist;
+        // this.pos.nums[0] = dist;
       } else if (line.maxY() > bottom) {
         this.moveStep.signY(false);
-        this.pos.nums[1] = yDim - dist;
+        // this.pos.nums[1] = yDim - dist;
       } else if (line.minY() < top) {
         this.moveStep.signY(true);
-        this.pos.nums[1] = dist;
+        // this.pos.nums[1] = dist;
       }
     });
 
-    this.moveStep = this.moveStep.multiply(new Vector([dampeningFactor, dampeningFactor]));
+    this.moveStep = this.moveStep.multiply(new Vector([0.95, 0.95]));
     this.orientMoveStep *= dampeningFactor;
     if (Math.abs(this.moveStep.x()) < 0.1) {
       this.moveStep.nums[0] = 0;
     }
-    if (Math.abs(this.moveStep.y()) < 0.1) {
+    if (Math.abs(this.moveStep.y()) < 0.3) {
       this.moveStep.nums[1] = 0;
     }
     this.orientMoveStep = -this.orientMoveStep;
   }
+
+  update(extAcceleration, grid, yDim) {
+    let maxY = 0;
+
+    this.asLines().forEach(line => {
+      if (line.maxY() > maxY) {
+        maxY = line.maxY();
+      }
+    });
+
+    const start = this.gridPos(grid.gridSize);
+    if (extAcceleration && maxY <= yDim) {
+      this.moveStep = this.moveStep.add(extAcceleration);
+    }
+
+    this.updatePosition();
+    this.updateOrientation();
+    this.updateVelocity();
+
+    const end = this.gridPos(grid.gridSize);
+
+    grid.move(this.id, start, end);
+  }
+
 }
 
 module.exports = Triangle;

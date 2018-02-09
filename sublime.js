@@ -42,5 +42,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const canvas = document.getElementById('canvas');
   canvas.addEventListener('click', s.setAttractor.bind(s));
-  // window.setInterval(SandBox.start.bind(SandBox, 1000, 1000), 2500);
 });

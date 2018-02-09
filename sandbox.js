@@ -34,7 +34,6 @@ class SandBox {
 
   getRelativePos(e) {
     //reference: https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
-
     let x, y;
     if (e.pageX || e.pageY) {
       x = e.pageX;
@@ -44,19 +43,11 @@ class SandBox {
       y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     }
     const canvas = document.getElementById('canvas');
-    //1980+ x = 240, y = 85
-    //1820+ x = 140, y = 48
-    //1620+ x = 93, y = 48
-
-    //1240+ x = 35, y = 18
-    //120+ x = 0, y = 0
-    //else x = -76, y = -41
     const width = Util.getWidth();
     const [offsetX, offsetY] = Util.getMarginOffsets(width);
     const scale = Util.getScale(width);
     x -= (canvas.offsetLeft - offsetX);
     y -= (canvas.offsetTop - offsetY);
-    debugger
     return [x / scale, y / scale];
   }
 
@@ -165,13 +156,13 @@ class SandBox {
           if (!body.cannotCollide && bodyId !== otherBodyId && body.intersectsWith(otherBody)) {
             body.collide(otherBody, this.dampeningFactor);
             const extAcceleration = this.attractiveForce.call(otherBody).add(gravity);
-            otherBody.update(extAcceleration, this.grid);
+            otherBody.update(extAcceleration, this.grid, this.yDim);
           }
         }
       }
 
       const extAcceleration = this.attractiveForce.call(body).add(gravity);
-      body.update(extAcceleration, this.grid);
+      body.update(extAcceleration, this.grid, this.yDim);
     }
   }
 
